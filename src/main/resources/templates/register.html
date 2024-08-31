@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      xmlns:layout="http://www.ultrag.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/basic}">
+
+<!-- 현재 페이지에서만 사용하는 컨텐츠(내용) 정의 -->
+<div layout:fragment="content" class="p-4">
+  <div class="card">
+    <div class="card-header">Board Register</div>
+    <div class="card-body m-4">
+      <form action="/register" method="post">
+
+        <!-- 1. 글 제목 -->
+        <div class="form-floating mb-3">
+          <input type="text" class="form-control"
+                 id="title"
+                 name="title"
+                 placeholder="2자이상 100이내로 작성하세요">
+          <label for="title">Title</label>
+        </div>
+
+        <!-- 2. 게시글 내용 -->
+        <div class="form-floating mb-3">
+            <textarea class="form-control h-25"
+                      id="content"
+                      name="content"
+                      rows="10"></textarea>
+          <label for="content">Comments</label>
+        </div>
+
+        <!-- 작성자, 이메일 -->
+        <div class="row mb-3">
+          <!-- 3. 게시글 작성자 -->
+          <div class="form-floating col-6">
+            <input type="text" class="form-control"
+                   placeholder="반드시 내용이 입력되어야 합니다."
+                   id="writer"
+                   name="writer" />
+            <label for="writer">Writer</label>
+          </div>
+
+          <!-- 4. 게시글 작성자 이메일 -->
+          <div class="form-floating col-6">
+            <input type="text" class="form-control"
+                   id="email"
+                   name="email" />
+            <label for="email">Email</label>
+          </div>
+        </div>
+
+        <!-- 5. 글 보내기 버튼 -->
+        <div class="my-4">
+          <div class="float-end">
+            <button type="submit" class="btn btn-primary submitBtn">Submit</button>
+            <button type="reset" class="btn btn-secondary">Reset</button>
+          </div>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+
+  <!-- axios라이브러리 연결 -->
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <!-- file upload 처리하는 javascript 연결 -->
+  <script src="/js/upload.js"></script>
+</div>
+
+<!-- 현재 페이지에서만 사용하는 css 정의 -->
+<style layout:fragment="mystyle" th:inline="css">
+  .uploadResult > .card {
+    margin-right: 0.3em;
+    margin-bottom: 0.3em;
+  }
+  .uploadResult > .card:last-child {
+    margin-right: 0;
+  }
+</style>
+
+<!-- 현재 페이지에서만 사용하는 javascript 정의 -->
+<!-- 현재 페이지에서만 사용하는 css 정의 -->
+<script layout:fragment="myscript" th:inline="javascript">
+  const errors = [[${errors}]]
+  console.log('errors',errors);
+
+  let errMessage = "";
+  if (errors) {// 서버로 부터 응답 에러 메시지 처리
+    for (let i=0; i<errors.length; i++){
+      errMessage += `${errors[i].field}은 ${errors[i].code}\n`;
+    }
+    alert(errMessage)
+  }
+
+  // form 하위요소 객체에 대한 변수 선언
+  const formObj =  document.querySelector('form')
+  const title = document.querySelector('#title');
+  const content = document.querySelector('#content');
+  const writer = document.querySelector('#writer');
+
+  // 클라이언트에서 먼저 입력항목에 대한 유효성 검사 처리
+  /*
+  document.querySelector('.submitBtn').addEventListener('click', function(e){
+    e.stopPropagation();
+    e.preventDefault(); // submit()기본 기능 제거
+
+    if (title.value.length < 1 || title.value == ""){
+      alert("글제목 비어 있습니다.");
+      title.focus();
+      return;
+    }
+    if ( title.value.length < 3 || title.value.length > 100) {
+        alert("3자 이상 100자 이내에서만 작성 가능합니다.");
+        title.focus();
+        return;
+    }
+
+    // 값에 이상이 없으면 서버에 전송
+    formObj.submit();
+  });
+  */
+
+
+  // --------------------------------------------------------------------------------//
+  // 업로드 모달
+  // --------------------------------------------------------------------------------//
+  const uploadModal = new bootstrap.Modal(document.querySelector('.uploadModal'))
+
+  // 1. [Add Files]버튼 클릭하면 모달창 띄우기
+  document.querySelector(".uploadFileBtn").addEventListener('click',function(e){
+    e.stopPropagation()
+    e.preventDefault()
+
+    uploadModal.show();// 모달창 표시
+
+  })
+
+  // 2. 업로드 모달에서 Close버튼 클릭
+  document.querySelector(".closeUploadBtn").addEventListener('click',function(e){
+    e.stopPropagation()
+    e.preventDefault()
+
+    uploadModal.hide();// 모달창 숨기기
+
+  })
+
+  // 3.  업로드 모달에서 uploadBtn 버튼 클릭: 선택한 파일을 서버에 업로드처리
+  document.querySelector(".uploadBtn").addEventListener('click',function(e){
+    e.stopPropagation()
+    e.preventDefault()
+
+    // 자바스크립트 FormData객체를 이용하여 전송할 파일을 저장(보관)
+    const formObj = new FormData()
+    const fileInput = document.querySelector("input[name='files']")
+    // 또는 const fileInput = document.querySelector("#files")
+    //console.log(fileInput.files)// 선택된 파일이름이 <input type="file" name="files" />요소에 배열구조로 저장
+
+    const files = fileInput.files
+    for (let i=0; i<files.length; i++){
+      // "files"키이름은 서버에 받을 UploadFileDTO객체속성중에서 files과 동일한 속성명이면 1:1자동 맵핑
+      formObj.append("files", files[i])   // javascript FormData객체를 이용해서 정보를 추가
+    }
+
+    // 업로드 처리하는 함수 호출: axios요청
+    uploadToServer(formObj).then( result => {
+      console.log("업로드 정상처리 응답결과:"+result.data)
+
+      // 업로드된 결과를 JSON파일로 view 함수 호출
+      for (const uploadResult of result){
+        showUploadFile(uploadResult)
+      }
+
+      uploadModal.hide() // 모달창 숨기기
+    }).catch( e => {
+      console.log('업로드 실패=>', e)
+      uploadModal.hide()
+    })
+
+  })
+
+
+  // --------------------------------------------------------------------------- //
+  // 게시물 등록 : 게시글 정보, 첨부파일이름 DB에 저장 요청
+  // ---------------------------------------------------------------------------- //
+  document.querySelector('.submitBtn').addEventListener('click', function(e){
+    e.stopPropagation()
+    e.preventDefault()
+
+    // 유효성 검사
+    if (title.value.length < 1 || title.value == ""){
+      alert("글제목 비어 있습니다.");
+      title.focus();
+      return;
+    }
+    if ( title.value.length < 3 || title.value.length > 100) {
+      alert("3자 이상 100자 이내에서만 작성 가능합니다.");
+      title.focus();
+      return;
+    }
+
+
+
+    // [Add Files]버튼 =>  <input type='hidden' name="fileNames"/>요소 전환
+    target.innerHTML = str;
+    document.querySelector('form').submit();
+
+
+
+  })
+
+
+
+
+
+</script>
+</html>

@@ -1,7 +1,10 @@
 package com.spring.boardtest.repository.search;
 
+
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.JPQLQuery;
+import com.spring.boardtest.dto.BoardListAllDTO;
 import com.spring.boardtest.entity.Board;
 
 import com.spring.boardtest.entity.QBoard;
@@ -13,99 +16,110 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Log4j2
 public class BoardSearchImpl extends QuerydslRepositorySupport implements BoardSearch {
 
-    // 인자가 있을 경우
-    public BoardSearchImpl() {
-        super(Board.class);
-    }
+  public BoardSearchImpl() {
+    super(Board.class);
+  }
 
-    @Override
-    public Page<Board> search1(Pageable pageable) {
-        log.info("=> Page...");
-        return null;
-    }
+  @Override
+  public Page<Board> search(Pageable pageable) {
+    QBoard board = QBoard.board;  // Entity -> QDomain
+    // 1. where 추가
+    JPQLQuery<Board> query = from(board);                      // select .. from board
+    query.where(board.title.contains("1"));
 
+    // 2. paging 추가
+    this.getQuerydsl().applyPagination(pageable, query);
+    // 3. 쿼리문 수행하여 결과 값을 List구조 반환
+    List<Board> list = query.fetch();
+    long count = query.fetchCount();
 
-    @Override
-    public Page<Board> search2(Pageable pageable) {
-        log.info("=> 페이징2 ");
+    return new PageImpl<>(list, pageable, count);
+  }
 
-        QBoard board = QBoard.board;  // Entity -> QDomain
+  @Override
+  public Page<Board> searchAll(String[] types, String keyword, Pageable pageable) {
+    QBoard board = QBoard.board;  // Entity -> QDomain
 
-        // 1. where 추가
-        JPQLQuery<Board> query = from(board);                      // select .. from board
-        query.where(board.title.contains("1"));
+    // 1. query 작성
+    JPQLQuery<Board>  query = from(board);
 
-        // 2. paging 추가
-        this.getQuerydsl().applyPagination(pageable,query);
-        // 3. 쿼리문 수행하여 결과 값을 List구조 반환
-        List<Board> list = query.fetch();
-        long count = query.fetchCount();
-        log.info("=> "+count);
+    if ( (types != null && types.length > 0) && keyword != null){// 검색 키워드가 있으면
+      BooleanBuilder booleanBuilder = new BooleanBuilder();
 
-        // 2-1. BooleanBuilder: 조건문을 작성하는 클래스
-        BooleanBuilder booleanBuilder = new BooleanBuilder();
+      for (String type : types){
+          switch (type){
+            case "t":
+              booleanBuilder.or(board.title.contains(keyword));break;
+            case "c":
+              booleanBuilder.or(board.content.contains(keyword));break;
+            case "w":
+              booleanBuilder.or(board.writer.contains(keyword));break;
+          }
+      } // end for
 
-        // where title like '%11%' or content like '%11%'
-        booleanBuilder.or(board.title.contains("1"));
-        booleanBuilder.or(board.content.contains("1"));
+      query.where(booleanBuilder);
+    }// end if
 
-        // query
-        JPQLQuery<Board>  query2 = from(board);
-        query2.where(booleanBuilder);
-        query2.where(board.bno.gt(0L));//and 연결
+    this.getQuerydsl().applyPagination(pageable, query);
+    List<Board> list = query.fetch();
+    long count = query.fetchCount();
 
-        // paging
-        this.getQuerydsl().applyPagination(pageable,query);
-        // query
-        List<Board> list2 = query.fetch();
-        long count2 = query2.fetchCount();
-        log.info("=> "+count2);
+    return new PageImpl<>(list, pageable, count);
+  }
 
+  // 게시물 조건 검색 조회 구현
+  @Override
+  public Page<BoardListAllDTO> searchWithAll(
+                                String[] types,
+                                String keyword,
+                                Pageable pageable) {
 
-        return new PageImpl<>(list2, pageable, count);
+    QBoard board = QBoard.board;
 
-    }
+    // 1. 쿼리문 작성(댓글 기준으로 게시글 연결)
+    JPQLQuery<Board> boardJPQLQuery = from(board);
 
-    @Override
-    public Page<Board> searchAll(String[] types, String keyword, Pageable pageable) {
+    // 5. 검색 조건문 추가 : where 문 작성
+    if ( (types != null && types.length > 0) && keyword != null){// 검색 키워드가 있으면
+      BooleanBuilder booleanBuilder = new BooleanBuilder();
 
-        QBoard board = QBoard.board;  // Entity -> QDomain
+      for (String type : types){
+        switch (type){
+          case "t":
+            booleanBuilder.or(board.title.contains(keyword));break;
+          case "c":
+            booleanBuilder.or(board.content.contains(keyword));break;
+          case "w":
+            booleanBuilder.or(board.writer.contains(keyword));break;
+        }
+      } // end for
+      boardJPQLQuery.where(booleanBuilder);
+    }// end if
 
-        // 1. query 작성
-        JPQLQuery<Board>  query = from(board);
+    boardJPQLQuery.groupBy(board);
+    getQuerydsl().applyPagination(pageable, boardJPQLQuery);
 
-        if ( (types != null && types.length > 0) && keyword != null){// 검색 키워드가 있으면
-            //  BooleanBuilder: 조건문을 작성하는 클래스
-            BooleanBuilder booleanBuilder = new BooleanBuilder();
+    List<BoardListAllDTO> dtoList = boardJPQLQuery.select(board)
+            .fetch()
+            .stream()
+            .map(boardEntity -> BoardListAllDTO.builder()
+                    .bno(boardEntity.getBno())
+                    .title(boardEntity.getTitle())
+                    .writer(boardEntity.getWriter())
+                    .email(boardEntity.getEmail())
+                    .regDate(boardEntity.getRegDate())
+                    .build())
+            .collect(Collectors.toList());
 
-            for (String type : types){
-                switch (type){
-                    case "t":
-                        booleanBuilder.or(board.title.contains(keyword));break;
-                    case "c":
-                        booleanBuilder.or(board.content.contains(keyword));break;
-                    case "w":
-                        booleanBuilder.or(board.writer.contains(keyword));break;
-                }
-            } // end for
+    long totalcount = boardJPQLQuery.fetchCount();
 
-            query.where(booleanBuilder);
-        }// end if
+    return new PageImpl<>(dtoList, pageable, totalcount);
 
-
-        // 2. paging 추가
-        this.getQuerydsl().applyPagination(pageable,query);
-        // 3. query 실행
-        List<Board> list = query.fetch();
-        long count = query.fetchCount();
-        //또는 long count = query.fetch().size();
-
-
-        return new PageImpl<>(list, pageable, count);
-    }
+  }
 
 }

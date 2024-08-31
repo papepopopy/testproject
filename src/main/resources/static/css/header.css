@@ -1,0 +1,222 @@
+/* header */
+.menu-list {
+    display: flex;
+    flex: 1 1 40%;
+    justify-content: space-around;
+    margin-bottom: 28px;
+}
+.menu-list>li {
+    padding: 39px 0;
+    font-size: 22px;
+    font-weight: 500;
+}
+.sub-menu01 {
+    display: none;
+}
+.sub-menu01>li>a {
+    font-size: 18px;
+    font-weight: 700;
+}
+.sub-menu02>li>a {
+    font-size: 14px;
+    font-weight: 400;
+}
+.link-box {
+    display: flex;
+    margin-bottom: 28px;
+    gap: 20px;
+}
+.link-box>li {
+    padding: 42px 0;
+}
+.link-box>li>a {
+    font-size: 14px;
+    font-weight: 400;
+}
+
+.sub-menu01 {
+    display: none;
+}
+.sub-menu01>li>a {
+    font-size: 18px;
+    font-weight: 700;
+}
+.sub-menu02>li>a {
+    font-size: 14px;
+    font-weight: 400;
+}
+header {
+    display: flex;
+    justify-content: space-between;
+}
+.header-inner .logo-box {
+    background-color: #38aed6;
+    height: 100%;
+}
+.header-inner .logo-box a {
+    text-align: center;
+    padding: 25px 20px;
+    display: inline-block;
+}
+
+.header-inner .menu-box {
+    display: none;
+}
+
+.header-inner .logo-box img {
+    width: 55px;
+}
+.header-inner .link-box {
+    display: flex;
+    margin-bottom: 28px;
+    gap: 20px;
+}
+
+.header-inner .menu-list {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 28px;
+    gap: 40px;
+}
+.header-inner {
+    width: 100%;
+    margin-right: auto;
+    margin-left: auto;
+    position: relative;
+    align-items: center;
+}
+.header-inner .menu_open {
+    display: block;
+    position: absolute;
+    right: 0;
+    width: 30px;
+    height: 30px;
+    margin: 20px;
+    align-content: center;
+}
+.header-inner .menu_open span {
+    display: block;
+    background-color: #38aed6;
+    width: 100%;
+    height: 2px;
+    margin: 6px 0;
+}
+.header-inner .menu-box .menu-btn {
+    display: flex;
+    justify-content: flex-end;
+}
+.header-inner .menu_close {
+    display: block;
+    width: 30px;
+    height: 30px;
+    margin: 20px;
+    align-content: center;
+    position: relative;
+}
+.header-inner .menu_close span {
+    display: block;
+    background-color: #fff;
+    width: 100%;
+    height: 2px;
+}
+.header-inner .menu_close span:nth-child(1) {
+    transform: rotate(47deg);
+    position: absolute;
+}
+.header-inner .menu_close span:nth-child(2) {
+    transform: rotate(135deg);
+    position: absolute;
+}
+
+@media (min-width: 576px) {
+    .header-inner {
+        max-width:540px
+    }
+}
+
+@media (min-width: 768px) {
+    .header-inner {
+        max-width:720px
+    }
+}
+
+@media (min-width: 992px) {
+    .header-inner {
+        max-width:960px
+    }
+    .header-inner .logo-box img {
+        width: 75%;
+    }
+    .header-inner .logo-box a {
+        text-align: center;
+        padding: 35px 15px;
+        display: inline-block;
+    }
+}
+@media (max-width: 1200px) {
+    /* 메뉴 active 상태 */
+    .header-inner .menu-box.active {
+        display: block;
+        position: fixed;
+        top: 0;
+        right: 0;
+        z-index: 50;
+        width: 450px;
+        height: 100vh;
+        background-color: #38aed6;
+        padding: 20px;
+    }
+    .header-inner .menu-box.active .menu-list {
+        padding-bottom: 20px;
+        margin-bottom: 20px;
+        border-bottom: 1px #fff solid;
+    }
+    .menu-box.active .menu-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+        margin: 0;
+    }
+    .menu-box.active .menu-list>li {
+        padding: 15px 0;
+        font-size: 22px;
+        font-weight: 400;
+    }
+    .menu-box.active .menu-list>li a {
+        color: #fff;
+    }
+    .menu-box.active .link-box>li {
+        padding: 0;
+    }
+    .menu-box.active .link-box>li>a {
+        color: #dcf6ff;
+    }
+}
+@media (min-width: 1200px) {
+    .header-inner {
+        max-width:1140px
+    }
+    .header-inner .menu-box {
+        display: flex;
+        justify-content: space-between;
+        gap: 75px;
+    }
+    .header-inner .menu_close {
+        display: none;
+    }
+    .header-inner .menu_open {
+        display: none;
+    }
+    .header-inner .menu_open span {
+        display: none;
+    }
+}
+
+@media (min-width: 1400px) {
+    .header-inner {
+        max-width:1320px;
+    }
+    header.container {
+        max-width: 1600px;
+    }
+}

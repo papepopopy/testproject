@@ -111,12 +111,12 @@ class BoardRepositoryTest {
     public void testSearch1(){
         Pageable pageable = PageRequest.of(0,5, Sort.by("bno").descending());
 
-        Page<Board> result  = boardRepository.search2(pageable);
+        Page<Board> result  = boardRepository.search(pageable);
         result.getContent().forEach( board -> log.info("=> list:"+board));
 
         log.info("----");
 
-        List<Board> contents =  boardRepository.search2(pageable).getContent();
+        List<Board> contents =  boardRepository.search(pageable).getContent();
         contents.forEach( board -> log.info("=> list2:"+board));
     }
 

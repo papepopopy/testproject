@@ -1,10 +1,181 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      xmlns:layout="http://www.ultrag.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/basic}"    >
 
-</body>
+
+<!-- 현재 페이지에서만 사용하는 컨텐츠(내용) 정의 -->
+<div layout:fragment="content" class="p-4">
+
+    <div class="card">
+      <div class="card-header">
+        Board Read
+      </div>
+
+      <div class="card-body m-4">
+        <form action="/register" method="post" >
+          <!-- 1. 글 제목 -->
+          <div class="form-floating mb-3">
+
+            <input type="text" 	class="form-control"
+                   id="bno"
+                   name="bno"  th:value="${dto.bno}" readonly  >
+            <label for="title" >Bno</label>
+          </div>
+
+          <!-- 1. 글 제목 -->
+          <div class="form-floating mb-3">
+
+            <input type="text" 	class="form-control"
+                   id="title"
+                   name="title"   th:value="${dto.title}" readonly
+                   placeholder="2자이상 100이내로 작성하세요">
+            <label for="title" >Title</label>
+          </div>
+
+          <!-- 2. 게시글 내용 -->
+          <div class="form-floating mb-3">
+            <!-- bootstrap에서 textarear rows 적용시 class가 "h-25"설정되어야 함. -->
+            <textarea class="form-control h-25"
+                      id="content"
+                      name="content"
+                      rows="10"
+                      readonly
+                       >[[${dto.content}]]</textarea>
+            <label for="content" >Comments</label>
+
+          </div>
+          <!-- 3. 게시글 작성자 -->
+          <div class="form-floating mb-3">
+            <input type="text" class="form-control"
+                   id="writer"
+                   name="writer" th:value="${dto.writer}" readonly
+                   placeholder="반드시 내용이 입력되어야 합니다." >
+            <label for="writer">Writer</label>
+          </div>
+          <!-- 3-1. 게시글 작성자 이메일 -->
+          <div class="form-floating mb-3">
+            <input type="email" class="form-control"
+                   id="email"
+                   name="email" th:value="${dto.email}" readonly
+                   placeholder="반드시 내용이 입력되어야 합니다." >
+            <label for="email">Email</label>
+          </div>
+
+
+          <!-- 4. List, Modify 버튼 -->
+          <!-- 로그인 상태 정보 객체(#authentication.principal:로그인 했을 경우에만 생성되는 객체변수) -->
+          <div class="my-4">
+
+            <!-- 로그인 미적용
+            <div class="my-4">   -->
+
+            <!-- 현 글번호에 대한 페이징 정보를 넘겨받아서 list요청시 페이징 정보와 같이 요청하면 현재 글번호가 해당되는 list페이지 추출됨 -->
+            <div class="float-end" th:with="link=${pageRequestDTO.getLink()}">
+              <a th:href="|@{/list}?${link}|">
+                <button type="button" class="btn btn-primary ">List</button></a>
+              <a th:href="|@{/modify(bno=${dto.bno})}&${link}|">
+                <button type="button" class="btn btn-secondary" >Modify</button>
+              </a>
+            </div>
+          </div>
+
+        </form>
+      </div>
+    </div>
+  <!-- --------------------------------------------------------------------  -->
+
+
+  <!-- --------------------------------------------------------------------  -->
+  <!-- Modal UI start-->
+
+  <!-- message modal -->
+  <div class="modal  messageModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Message</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <!-- 메시지 전달 하는 부분 -->
+          <p id="modal_message"></p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <!--          <button type="button" class="btn btn-primary">Save changes</button>-->
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- end message modal -->
+
+  <!-- --------------------------------------------------------------------  -->
+
+
+  <!-- Axios 라이브러리 연결 -->
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</div>
+
+
+
+<!-- 현재 페이지에서만 사용하는 css 정의 -->
+<style layout:fragment="mystyle" th:inline="css">
+  .mylink {
+    cursor: pointer;
+  }
+  .thumbnail > img {
+    margin-right: 0.2em;
+    margin-bottom: 0.2em;
+  }
+  .thumbnail > img:last-child {
+    margin-right: 0; margin-bottom: 0;
+  }
+
+</style>
+
+
+
+<!-- 현재 페이지에서만 사용하는 css 정의 -->
+<script layout:fragment="myscript" th:inline="javascript">
+
+  //서버로 부터 응답받은 메시지: db처리한 후 결과 값 전송한 객체
+  const result = [[${result}]]
+  const bno = [[${dto.bno}]]  // 전역 변수: 댓글에 대한 게시글 번호
+
+
+  let page = 1; // 현재 페이지 번호
+  let size = 5; // 페이지해당 되는 레코드(행)의 개수
+  printReplies(page,size,true);// 현재 페이지번호, 페이지 사이즈, 마지막 페이지 사용여부
+
+  // ------------------------------------------------------------------------ //
+
+
+  //--------------------------------------------- //
+  // response message show modal창에 메시지 출력하기
+  //-------------------------------------------- //
+  const message_show = new bootstrap.Modal(document.querySelector('.messageModal'));
+
+  let message = "";
+  if (result) { // 응답이 있을 경우만 처리
+    if (result=="modified"){// 응답 객체 내용이 "modified"이면 처리
+        message = bno+"번 글번호 게시글이 수정 되었습니다.";
+
+        // 모달 창에 전달할 메시지 태그 요소 추출
+        const modal_message = document.querySelector('#modal_message');
+        // 메시지 문자열를 태그요소에 넣기
+        modal_message.innerHTML = message;
+
+        // 모달 창 표시
+        message_show.show();
+    }
+  }
+
+
+
+
+</script>
+
+
 </html>

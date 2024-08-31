@@ -1,0 +1,724 @@
+/* 아이콘 링크 */
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css');
+
+/* 기본설정 */
+@font-face {
+    font-family: 'NotoSansKR';
+    font-style: normal;
+    font-weight: 400;
+    src: url('/TeamProject/assets/fonts/NotoSansKR-Regular.ttf') format('truetype');
+    letter-spacing: -0.003em;
+}
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    color: #333;
+    font-family: 'NotoSansKR', sans-serif;
+    letter-spacing: -0.5px;
+}
+ul, li {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+a {
+    color: #333;
+    text-decoration: none;
+}
+
+h1 {
+    font-size: 32px;
+    font-weight: 800;
+    margin-bottom: 30px;
+}
+
+h2 {
+    font-size: 24px;
+    margin-bottom: 10px;
+    font-weight: 600;
+}
+
+h3 {
+    font-size: 18px;
+    margin-bottom: 5px;
+    font-weight: 600;
+    line-height: 1.5;
+}
+h4 {
+    font-size: 14px;
+}
+.center {
+    text-align: center;
+}
+
+.body {
+    margin: 60px 0;
+}
+
+/* 공통 스타일 */
+/* 카테고리 */
+.with-4 {
+    flex: 1 1 100%;
+}
+.title {
+    text-align: center;
+}
+.tag-list-box ul {
+    display: flex;
+    justify-content: center;
+    margin: 45px 0 70px;
+}
+.tag-list a {
+    display: block;
+    text-align: center;
+    font-size: 17px;
+    padding: 10px 0;
+    color: #777;
+    border-bottom: 1px solid #777;
+    outline-offset: -3px;
+}
+.tag-list a.active {
+    color: #000;
+    border-bottom: 2px solid #000;
+    font-weight: 700;
+}
+.nav-date {
+    display: flex;
+    padding: 0 10px;
+}
+.right {
+    text-align: right;
+}
+.left {
+    text-align: left;
+}
+/* 버튼 */
+.controlBox {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin: 30px 0 20px;
+}
+.controlBox li {
+    border: 1px solid #ccc;
+    padding: 4px 16px;
+    border-radius: 25px;
+    font-size: 16px;
+}
+.controlBox li.active {
+    background-color: #38aed6;
+    border: #38aed6;
+    color: #fff;
+}
+/* 제목 스타일 */
+.topBox {
+    text-align: center;
+    margin-bottom: 30px;
+}
+.topBox .controlBox {
+    justify-content: center;
+}
+
+/* 게시판 이미지박스 */
+.img-box img {
+    width: 100%;
+    text-align: center;
+}
+
+/* 게시판 레이아웃 4*3 */
+.postsBox {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+.postsBox .post {
+    max-width: 100%;
+    margin-bottom: 10px;
+}
+.postsBox .postTitle {
+    font-size: 16px;
+    color: #000;
+    line-height: 20px;
+    font-weight: 545;
+    height: 20px;
+    overflow: hidden;
+    margin: 15px 0 5px;
+    display: -webkit-box;
+    text-overflow: ellipsis;
+    #fff-space:
+    normal;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+}
+.postsBox .postRegDate {
+    font-size: 15px;
+    color: #777;
+}
+.postsBox .postText {
+    font-size: 15px;
+    display: flex;
+    gap: 10px;
+}
+.postsBox .postText li {
+    color: #555;
+}
+.postsBox .postText span {
+    color: #38aed6;
+}
+.postsBox .postDate {
+    font-size: 14px;
+    color: #999;
+    margin: 10px 0;
+}
+.postImgBox {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 300px;
+}
+.postImgBox img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.postsBox .downBox {
+    text-align: center;
+    padding: 0 0 20px 0;
+    border: 1px #ccc solid;
+    font-size: 16px;
+}
+/* post 박스 */
+.informationBox {
+    margin: 20px 0;
+}
+.informationBox .infor-inner-box  {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 0;
+}
+.informationBox .infor-inner-box  div {
+    flex: 1 1 50%;
+}
+.informationBox .infor-inner-box  .L-box {
+    position: relative;
+}
+
+.informationBox .infor-inner-box  .R-box, .informationBox .infor-inner-box  .L-box {
+    padding: 0;
+}
+.informationBox .infor-inner-box .L-box::after {
+    content: "";
+    display: none;
+    position: absolute;
+    width: 1px;
+    height: 100%;
+    right: 0;
+    top: 0;
+    background: #ddd;
+    z-index: -1;
+}
+.informationBox .infor-inner-box .infor-title {
+    font-weight: 600;
+    margin-right: 15px;
+}
+/* 다운로드, 목록 버튼 설정 */
+.informationBox .btnDownload, .btnList {
+    background-color: #fff;
+    color: #333;
+    padding: 10px 30px;
+}
+.informationBox .downloadBox {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+.informationBox .downloadBox .btnDownload {
+    border: 1px solid #333;
+    font-size: 16px;
+}
+.informationBox {
+    border: 1px solid #dee2e6;
+    padding: 25px 40px;
+    border-radius: 20px;
+    margin-bottom: 10px;
+}
+.informationBox p {
+    margin-bottom: 0.5rem;
+}
+/* 버튼 설정 */
+.home-btn {
+    background-color: #333;
+    color: #fff;
+    border: none;
+    padding: 10px 30px;
+    margin-top: 10px;
+}
+.down-btn {
+    color: #333;
+    border: 1px solid #b5b5b5;
+    padding: 5px 20px;
+    margin-top: 5px;
+    display: inline-block;
+}
+.down-btn:hover {
+    color: #fff;
+    border: none;
+    background-color: #38aed6;
+}
+.search-inner .select-box {
+    width: 100%;
+}
+.search-inner .btn-search {
+    background-color: #333;
+    color: #fff;
+    padding: 7px 15px;
+}
+.search-inner .form-control {
+    min-width: 185px;
+}
+.search_array {
+    display: flex;
+    justify-content: space-between;
+    padding: 20px 0;
+    font-size: 16px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+.search_array .sort {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+.search_array .sort a {
+    font-size: 16px;
+    display: inline-block;
+}
+.search_array .search-inner {
+    font-weight: 500;
+    display: flex;
+    gap: 5px;
+    flex-wrap: wrap;
+    margin-top: 10px;
+    width: 100%;
+}
+.search_array .search-inner span {
+    color: #e90049;
+}
+/* 공통스타일 end */
+
+/* mypage */
+.mypage .mypage-top-box img {
+    width: 160px;
+    height: 160px;
+    border-radius: 160px;
+    background-color: #aaa;
+}
+.mypage .mypage-link {
+    display: flex;
+    gap: 5px;
+}
+.mypage .mypage-link div {
+    background-color: #F2F2F2;
+    padding: 4px 14px;
+    font-size: 14px;
+    border-radius: 14px;
+}
+.mypage .mypage-top-box {
+    display: flex;
+    gap: 30px;
+}
+.tab-menu {
+    display: flex;
+    border-bottom: 1px solid #DDD;
+}
+.tab-menu h3 {
+    padding: 15px 20px;
+    margin: 0;
+    font-weight: 500;
+}
+.tab-menu h3.active {
+    border-bottom: 1px solid #555;
+    font-weight: 600;
+}
+.mypage .rev-inner-list {
+    display: flex;
+    gap: 25px;
+}
+.mypage .rev-img {
+    margin: 30px 0 15px;
+}
+.mypage .rev-img img {
+    min-height: 160px;
+    width: 100%;
+    background-color: #333;
+    display: block;
+}
+.mypage .mypage-tag {
+    color: #AAA;
+    font-size: 13px;
+    border: 1px #AAA solid;
+    padding: 4px 10px;
+    border-radius: 16px;
+    display: inline-block;
+    margin-bottom: 10px;
+}
+.mypage .mypage-text {
+    font-size: 14px;
+    font-weight: 500;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    word-break: break-word;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    margin-bottom: 5px;
+    line-height: 18px;
+}
+.mypage .mypage-date {
+    font-size: 13px;
+    color: #aaa;
+    margin-bottom: 10px;
+}
+.mypage .mypage-star {
+    font-size: 14px;
+    color: #333;
+    background: url(/assets/images/mypage/star-icon.png) no-repeat left 3px;
+    padding-left: 20px;
+    float: right;
+}
+.mypage .pro-content .mail {
+    margin-bottom: 5px;
+    font-size: 18px;
+}
+.login-box {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* memberjoin */
+.memberjoin .login {
+    max-width: 600px;
+    margin: 0 auto;
+}
+.memberjoin .join-box {
+    margin-top: 125px;
+    position: relative;
+}
+.memberjoin .join-box::after {
+    content: "";
+    display: block;
+    position: absolute;
+    width: 425px;
+    height: 1px;
+    bottom: 63px;
+    left: 17%;
+    background: #ddd;
+    z-index: -1;
+}
+.memberjoin .join-box > div {
+    position: relative;
+}
+.memberjoin .join-box > div.active {
+    color: #333;
+}
+.memberjoin .join-box > div {
+    color: #aaa;
+}
+.memberjoin .join-box > div:nth-child(1).active:after {
+    background: #38aed6;
+    color: #fff;
+    border: 1px solid #38aed6;
+}
+.memberjoin .join-box > div:nth-child(1):after {
+    content: "1";
+    display: block;
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    border-radius: 50px;
+    bottom: 40px;
+    left: 40%;
+    background: #ffffff;
+    border: 1px solid #aaa;
+    transition: all .3s ease;
+    color: #aaa;
+    line-height: 46px;
+}
+.memberjoin .join-box > div:nth-child(2).active:after {
+    background: #38aed6;
+    color: #fff;
+    border: 1px solid #38aed6;
+}
+.memberjoin .join-box > div:nth-child(2):after {
+    content: "2";
+    display: block;
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    border-radius: 50px;
+    bottom: 40px;
+    left: 40%;
+    background: #ffffff;
+    border: 1px solid #aaa;
+    transition: all .3s ease;
+    color: #aaa;
+    line-height: 46px;
+}
+.memberjoin .join-box > div:nth-child(3).active:after {
+    background: #38aed6;
+    color: #fff;
+    border: 1px solid #38aed6;
+}
+.memberjoin .join-box > div:nth-child(3):after {
+    content: "3";
+    display: block;
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    border-radius: 50px;
+    bottom: 40px;
+    left: 40%;
+    background: #ffffff;
+    border: 1px solid #aaa;
+    transition: all .3s ease;
+    color: #aaa;
+    line-height: 46px;
+}
+
+
+.mypageMail .mali-img {
+    width: 75px;
+    height: 75px;
+    overflow: hidden;
+    border-radius: 75px;
+    display: flex;
+}
+.mypageMail .mali-img img {
+    background-color: #aaa;
+    width: 100%;
+}
+
+
+/* festivalBoard */
+
+.festivalBoard .dates > li > a , .days > li > a {
+    border: none;
+}
+
+/* 박스안 이미지 가득차게 수평 수직 가운데 정렬 1 */
+.festivalBoard button {
+    border: none;
+    background-color: transparent;
+    font-size: 16px;
+}
+.festivalBoard .pagination {
+    overflow: hidden;
+}
+
+/*  박스안 이미지 가득차게 수평 수직 가운데 정렬 2
+.festivalBoard .postImgBox {
+    position: relative;
+    overflow: hidden;
+    height: 300px;
+
+    img {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+}
+*/
+
+/* festivalPost */
+/* v-line 정보 창 세로 줄 */
+.festivalPost .v-line {
+    border-left : 1px solid lightgray;
+    height : 130px;
+    margin: 0px 30px;
+}
+
+
+/* destinationsList */
+.topBox .search {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+.topBox .search .form-control {
+    width: 50%;
+    border-radius: 50px 0 0 50px;
+    padding: 10px 20px;
+    border-right: 0px;
+}
+.topBox .search button {
+    border-radius: 0 50px 50px 0;
+    padding: 10px 20px;
+    background: #999;
+    color: #fff;
+}
+
+/* sharingList */
+.sharingList .top{
+    text-align: center;
+}
+.sharingList .middle{
+    margin-top: 150px;
+
+    align-items: center;
+}
+.sharingList .information{
+    margin-top: 50px;
+}
+.sharingList .place-box {
+    padding: 10px 0;
+    display: flex;
+    justify-content: space-between;
+}
+.sharingList .place-sit {
+    display: flex;
+    gap: 20px
+}
+.sharingList .place-sit li, .sharingList .place-save li {
+    font-size: 18px;
+    font-weight: 500;
+}
+.sharingList .place-sit span {
+    font-size: 18px;
+    margin-left: 5px;
+    color: #38aed6;
+}
+/* userBoard */
+/* 박스안 이미지 가득차게 수평 수직 가운데 정렬 */
+.userBoard .imgBox {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 300px;
+}
+/* 태그 창을 가운데 배치하기 위한 설정 */
+.userBoard .nav-tabs {
+    position: relative;
+}
+.userBoard .orderBy {
+    position: absolute;
+}
+/*-----------------------------------*/
+
+.userBoard .tags {
+    height: 50px;
+    line-height: 50px;
+}
+
+/* userCreate */
+.userCreate .UIBox {
+    gap: 10px;
+}
+.userCreate .categoryBox select, .UIBox button, .buttonBox button {
+    color: gray;
+}
+.userCreate .contentBox textarea {
+    height: 500px; width: 100%;
+}
+
+/* 아이콘 좌우반전 */
+.userCreate .scaleX-R{
+    transform: scaleX(-1);
+}
+.userCreate .UIBox button {
+    border: none;
+    background-color: #fff;
+}
+
+/* userPost */
+/* 이미지 크기 제한 */
+.userPost .imgBox {
+    width: 60px;
+}
+
+/* 이미지를 동그랗게 만듬 */
+.userPost .imgdiv {
+    overflow: hidden;
+    position: relative;
+    width: 100%;
+    height: 0;
+    padding-bottom: 100%;
+    margin-top: 0%;
+}
+.userPost .imgdiv img {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+}
+
+
+@media (min-width: 576px) {
+    .postsBox .post {
+        width: 100%;
+    }
+    .search-inner .select-box {
+        min-width: 110px;
+    }
+    .search_array .search-inner {
+        gap: 15px;
+        flex-wrap: nowrap;
+        width: auto;
+    }
+    .with-4 {
+        flex: 1 1 50%;
+    }
+}
+
+@media (min-width: 768px) {
+    .tag-list a {
+        padding: 20px 0;
+        font-size: 20px;
+    }
+    .postsBox .post {
+        width: 48.5%;
+    }
+    h1 {
+        font-size: 38px;
+    }
+    .tag-list-box ul {
+        display: flex;
+        justify-content: center;
+        margin: 85px 0 70px;
+    }
+}
+
+@media (min-width: 992px) {
+    .postsBox .post {
+        width: 31.9%;
+    }
+    .informationBox .infor-inner-box {
+        flex-direction: row;
+        margin-bottom: 10px;
+    }
+    .informationBox .infor-inner-box .L-box {
+        padding-right: 20px;
+    }
+    .informationBox .infor-inner-box .R-box {
+        padding-left: 20px;
+    }
+    .informationBox .infor-inner-box .L-box::after {
+        display: block;
+    }
+    .with-4 {
+        flex: 1 1 25%;
+    }
+}
+
+@media (min-width: 1200px) {
+    .postsBox .post {
+        width: 23.6%;
+    }
+}
+@media (min-width: 1400px) {
+    .postsBox .post {
+        width: 23.8%;
+    }
+}

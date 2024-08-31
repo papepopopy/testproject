@@ -13,9 +13,8 @@ import java.time.LocalDateTime;
 
 @MappedSuperclass  // 공동속성처리
 @EntityListeners(value={AuditingEntityListener.class})
-@Setter
-@Getter
-public class BaseEntity {
+@Setter@Getter
+public abstract class BaseEntity {
     @CreatedDate
     @Column(name="regdate", updatable=false)
     private LocalDateTime regDate;

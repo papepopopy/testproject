@@ -1,10 +1,173 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultrag.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/basic}"    >
 
-</body>
+
+<!-- 현재 페이지에서만 사용하는 컨텐츠(내용) 정의 -->
+<div layout:fragment="content" class="p-4">
+
+    <div class="card">
+      <div class="card-header">
+        Board Modify
+      </div>
+
+      <div class="card-body m-4">
+        <form action="/modify"
+              th:action="@{/modify}" method="post" id="f1">
+          <!-- 1. 글 제목 -->
+          <div class="form-floating mb-3">
+
+            <input type="text" 	class="form-control"
+                   id="bno"
+                   name="bno"  th:value="${dto.bno}" readonly  >
+            <label for="title" >Bno</label>
+          </div>
+
+          <!-- 1. 글 제목 -->
+          <div class="form-floating mb-3">
+
+            <input type="text" 	class="form-control"
+                   id="title"
+                   name="title"   th:value="${dto.title}"
+                   placeholder="2자이상 100이내로 작성하세요">
+            <label for="title" >Title</label>
+          </div>
+
+          <!-- 2. 게시글 내용 -->
+          <div class="form-floating mb-3">
+            <!-- bootstrap에서 textarear rows 적용시 class가 "h-25"설정되어야 함. -->
+            <textarea class="form-control h-25"
+                      id="content"
+                      name="content"
+                      rows="10"
+                       >[[${dto.content}]]</textarea>
+            <label for="content" >Comments</label>
+
+          </div>
+
+          <!-- 작성자,  이메일 1행 2열로 재배치 -->
+          <div class="row">
+            <!-- 3. 게시글 작성자 -->
+            <div class="form-floating mb-3 col-6">
+              <input type="text" class="form-control"
+                     id="writer"
+                     name="writer" th:value="${dto.writer}" readonly
+                     >
+              <label for="writer">Writer</label>
+            </div>
+
+            <!-- 5. 게시글 작성자 이메일
+             현재 로그인 사용자와 게시글 작성자가 동일한 판별하기위한 항목 -->
+            <div class="form-floating mb-3 col-6">
+              <!-- 로그인 상태일 경우만 #authentication객체변수 적용  -->
+              <input type="email" class="form-control"
+                     id="email"
+                     name="email"
+                     th:value="${dto.email}" readonly  />
+              <label for="email">Email</label>
+            </div>
+
+          </div>
+          <!-- 4. List, Modify 버튼-->
+          <div class="my-4">
+            <button type="button" class="btn btn-primary   listBtn">List</button>
+            <button type="button" class="btn btn-secondary modBtn">Modify Finish</button>
+            <button type="button" class="btn btn-danger    removeBtn" >Remove</button>
+          </div>
+
+        </form>
+      </div>
+
+    </div>
+
+
+  <!-- axios라이브러리 연결 -->
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <!-- file upload 처리하는 javascript 연결 -->
+  <script src="/js/upload.js"></script>
+</div>
+
+<!-- 현재 페이지에서만 사용하는 css 정의 -->
+<style layout:fragment="mystyle" th:inline="css">
+
+</style>
+
+<!-- 현재 페이지에서만 사용하는 css 정의 -->
+<script layout:fragment="myscript" th:inline="javascript">
+
+  // 서버로 부터 응답받은 메시지: db처리한 후 결과 값 전송한 객체
+  const errors = [[${errors}]]
+  console.log('errors',errors);
+
+  let errMessage = "";
+  if (errors) {// 서버로 부터 응답 에러 메시지 처리
+    for (let i=0; i<errors.length; i++){
+      errMessage += `${errors[i].field}은 ${errors[i].code}\n`;
+    }
+
+    // 웹브라우저의 세션 기록을 관리하는 JavaScript의 History API메서드
+    // 브라우저의 세션 기록을 수정하거 대체하는 역할
+    //history.replaceState({},null, null);
+
+    alert(errMessage)
+  }
+
+  // 현재 글번호 게시글 페이징 정보
+  const link = [[${pageRequestDTO.getLink()}]]
+  const formObj = document.querySelector("#f1")
+
+
+  // 1. Modify 버튼 기능 처리
+  document.querySelector('.modBtn').addEventListener('click', function(e){
+    e.stopPropagation();// 현재 요소의 이벤트발생을 상위요소에서 이벤트 감지 하지 않게 기능
+    e.preventDefault(); // 기본 기능 제거
+    console.log("modify")
+
+    // javascript에서 action, method 속성 변경: 페이징 정보 추가
+    formObj.action = `/modify?${link}`
+
+
+    formObj.method = 'post';    // POST방식
+    formObj.submit();
+
+
+
+  });
+
+  // 2. List 버튼 기능 처리
+  document.querySelector('.listBtn').addEventListener('click', function(e){
+    e.stopPropagation();
+    e.preventDefault(); // 기본 기능 제거
+    console.log("list")
+
+    // 전송 기능
+    //formObj.submit();
+
+    // 리셋 기능(폼값 초기화)
+    //formObj.reset();
+
+    self.location=`/list?${link}`
+  });
+
+  // -------------------------------------------------------- //
+  // 3. Remove 버튼 기능 처리 => 특정 번호 게시글 삭제
+  // -------------------------------------------------------- //
+
+
+  document.querySelector('.removeBtn').addEventListener('click', function(e){
+    e.stopPropagation();
+    e.preventDefault(); // 기본 기능 제거
+    console.log("remove")
+
+
+    // javascript에서 action, method 속성 변경
+    formObj.action = `/remove`
+    formObj.method = 'post';
+    formObj.submit();
+
+  });
+
+</script>
+
 </html>

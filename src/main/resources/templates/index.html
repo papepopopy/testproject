@@ -1,0 +1,126 @@
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      xmlns:layout="http://www.ultrag.net.nz/thymeleaf/layout" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+  <meta name="description" content="" />
+  <meta name="author" content="" />
+  <title>Simple Sidebar - Start Bootstrap Template</title>
+
+  <!-- Core theme CSS (includes Bootstrap)-->
+  <link href="css/styles.css"
+        th:href="@{/css/styles.css}" rel="stylesheet" />
+</head>
+
+<body>
+
+<div class="d-flex" id="wrapper">
+
+  <!-- navigation bar-->
+  <div class=" fixed-top">
+    <nav class="navbar navbar-expand-lg bg-dark navbar-dark">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="#">boardTest</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+
+        <div class="collapse navbar-collapse" th:id="navbarSupportedContent">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page"
+                 href="/" th:href="@{/}">Home</a>
+            </li>
+
+            <li class="nav-item">
+              <a class="nav-link" href="/admin/item/new"
+                 th:href="@{/list}">리스트</a>
+            </li>
+          </ul>
+
+        </div>
+
+      </div> <!-- container-fluid  -->
+    </nav>
+  </div>
+
+
+  <!-- Page content wrapper-->
+  <div id="page-content-wrapper">
+    <!-- Top navigation-->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
+      <div class="container-fluid">
+        <button class="btn btn-primary" id="sidebarToggle">Toggle Menu</button>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav ms-auto mt-2 mt-lg-0">
+            <li class="nav-item active"><a class="nav-link" href="#!">Home</a></li>
+            <li class="nav-item"><a class="nav-link" href="#!">Link</a></li>
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Dropdown</a>
+              <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                <a class="dropdown-item" href="#!">Action</a>
+                <a class="dropdown-item" href="#!">Another action</a>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" href="#!">Something else here</a>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+
+    <!-- Page content-->
+    <div class="container-fluid">
+      <h1 class="mt-4">Thymeleaf Template Simple Sidebar</h1>
+      <hr>
+
+      <!-- ----------------------------------------------------------  -->
+    </div>
+
+
+
+  </div>
+
+
+</div>
+
+
+
+
+
+
+<!-- Bootstrap core JS-->
+<script src="js/bootstrap.bundle.min.js" th:src="@{/js/bootstrap.bundle.min.js}"></script>
+<!-- Core theme JS-->
+<script src="js/scripts.js"  th:src="@{/js/scripts.js}"></script>
+
+
+
+<!-- 현재 페이지에서만 사용하는 css 정의 -->
+<style th:inline="css">
+  .auth_margin_right {
+    margin-right: 30px;
+  }
+</style>
+<!-- 현재 페이지에서만 사용하는 javascript 정의 -->
+<script  th:inline="javascript">
+  console.log("index.html");
+  // ---------------------------------------------------------------------- //
+  // 스프링 시큐리티를 사용하는 경우 Authentication타입을 이용해서 사용자 정보를 추출
+  // ---------------------------------------------------------------------- //
+  const auth = [[${#authentication}]]
+  console.log("authentication:",auth);
+  console.log("authentication.principal:",auth.principal);
+  console.log("authentication.principal.authorities:",auth.principal.authorities);
+  // ---------------------------------------------------------------------- //
+</script>
+
+</body>
+
+</html>

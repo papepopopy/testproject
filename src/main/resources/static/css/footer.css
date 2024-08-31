@@ -1,0 +1,76 @@
+.f-inner {
+    background-color: #1C1F26;
+    padding: 20px 0;
+}
+.f-inner .f-top {
+    font-size: 15px;
+    gap: 0;
+    padding: 20px 0;
+    
+    flex-direction: column;
+}
+.f-inner .f-top li {
+    color: #999;
+    padding: 15px;
+    border: 1px #444444 solid;
+    font-size: 16px;
+}
+.f-inner .f-top li:first-child {
+    border-bottom: none;
+}
+.f-inner .f-top li:first-child {
+    color: #38AED6;
+}
+.f-inner .f-bottom {
+    display: block;
+    justify-content: space-between;
+    padding: 20px 0;
+}
+.f-inner .f-bottom .f-add {
+    padding: 20px 0 40px;
+}
+.f-inner .f-bottom .f-add span {
+    color: #999;
+    display: block;
+    font-size: 16px;
+}
+.f-inner .f-bottom .f-add span.import {
+    color: #fff;
+    margin-bottom: 15px;
+}
+.f-inner .f-bottom .f-icon {
+    display: flex;
+}
+@media (min-width: 576px) {
+    .f-inner .f-top {
+        font-size: 18px;
+        gap: 40px;
+        justify-content: flex-end;
+        flex-direction: row;
+        display: flex;
+    }
+    .f-inner .f-bottom .f-add {
+        padding: 20px 0 60px;
+    }
+    .f-bottom .f-add span {
+        font-size: 18px;
+    }
+    .f-inner .f-top li {
+        padding: 0;
+        border: none;
+    }
+}
+
+@media (min-width: 768px) {
+    .f-inner .f-bottom {
+        display: flex;
+    }
+}
+
+@media (min-width: 992px) {
+}
+
+@media (min-width: 1200px) {
+}
+@media (min-width: 1400px) {
+}
