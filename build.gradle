@@ -65,6 +65,11 @@ dependencies {
 	implementation 'net.coobird:thumbnailator:0.4.20'
 	// thymelef에서 인증 관련 라이브러리
 //	implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6:3.1.2.RELEASE'
+	
+	//SNS 로그인 모듈 추가
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+	implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
 
 	// https://mvnrepository.com/artifact/com.google.code.gson/gson
 	implementation 'com.google.code.gson:gson:2.11.0'
