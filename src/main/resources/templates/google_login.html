@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Login</title>
+</head>
+<body>
+    <div id="g_id_onload"
+         data-client_id="96181768947-eckgakvudg11uqfh4c07khmpkpgiq4i1.apps.googleusercontent.com"
+         data-login_uri="http://localhost:5502/google_login"
+         data-auto_prompt="false">
+    </div>
+    <div class="g_id_signin"
+         data-type="standard"
+         data-size="large"
+         data-theme="outline"
+         data-text="sign_in_with"
+         data-shape="rectangular"
+         data-logo_alignment="left">
+    </div>
+    <!--<script>
+        function handleCredentialResponse(response) {
+            console.log("Encoded JWT ID token: " + response.credential);
+            // 여기에서 JWT 토큰을 사용해 백엔드로 보내거나 클라이언트 측에서 사용
+        }
+    </script>-->
+    <script>
+        function handleCredentialResponse(response) {
+            const token = response.credential;
+            console.log("Encoded JWT ID token: " + token);
+
+            // 서버에 JWT 토큰을 전송하여 로그인 처리
+            fetch('/google_login/callback', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ token }) // JWT 토큰을 JSON 형태로 전송
+            })
+            .then(response => {
+                if (response.ok) {
+                    // 로그인 성공 후 메인 페이지로 리디렉션
+                    window.location.href = '/'; // 메인 페이지 URL
+                } else {
+                    // 로그인 실패 처리
+                    alert('로그인 실패. 다시 시도해 주세요.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+    </script>
+
+    <!--구글 api 사용을 위한 스크립트-->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+
+</body>
+</html>

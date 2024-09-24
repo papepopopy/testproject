@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller@Log4j2
-@RequestMapping("")
 @RequiredArgsConstructor
 public class BoardController {
   private final BoardService boardService;

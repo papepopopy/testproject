@@ -8,7 +8,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 // Swagger UI 라이브러리로 인하여 정적자원 경로가 변경됨
 // 정적자원 경로를 재설정 시킴
 @Configuration
-@EnableWebMvc
+//@EnableWebMvc
 public class CustomServletConfig implements WebMvcConfigurer {
   @Override
   public void addResourceHandlers(ResourceHandlerRegistry registry) {

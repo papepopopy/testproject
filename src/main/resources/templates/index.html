@@ -42,6 +42,7 @@
             </li>
           </ul>
 
+
         </div>
 
       </div> <!-- container-fluid  -->
@@ -79,15 +80,11 @@
     <div class="container-fluid">
       <h1 class="mt-4">Thymeleaf Template Simple Sidebar</h1>
       <hr>
+      <a href="/google_login" th:href="@{/google_login}">Google Login</a>
 
       <!-- ----------------------------------------------------------  -->
     </div>
-
-
-
   </div>
-
-
 </div>
 
 
@@ -110,13 +107,12 @@
 </style>
 <!-- 현재 페이지에서만 사용하는 javascript 정의 -->
 <script  th:inline="javascript">
-  console.log("index.html");
   // ---------------------------------------------------------------------- //
   // 스프링 시큐리티를 사용하는 경우 Authentication타입을 이용해서 사용자 정보를 추출
   // ---------------------------------------------------------------------- //
   const auth = [[${#authentication}]]
   console.log("authentication:",auth);
-  console.log("authentication.principal:",auth.principal);
+  //console.log("authentication.principal:",auth.principal);
   console.log("authentication.principal.authorities:",auth.principal.authorities);
   // ---------------------------------------------------------------------- //
 </script>
