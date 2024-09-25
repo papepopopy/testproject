@@ -10,7 +10,8 @@
 <!-- Google 로그인 로드. 클라이언트 ID와 로그인 URI를 지정 -->
 <div id="g_id_onload"
      data-client_id="96181768947-eckgakvudg11uqfh4c07khmpkpgiq4i1.apps.googleusercontent.com"
-     data-login_uri="http://localhost:5502/google_login" <!-- 로그인 성공 후 리디렉션될 URI -->
+     data-login_uri="http://localhost:5502/loginForm">
+<!-- 로그인 성공 후 리디렉션될 URI -->
 data-auto_prompt="false"> <!-- 자동으로 로그인 팝업을 띄우지 않도록 설정 -->
 </div>
 
@@ -31,7 +32,7 @@ data-logo_alignment="left"> <!-- Google 로고 정렬: 왼쪽 -->
         console.log("Encoded JWT ID token: " + token);
 
         // 서버에 JWT 토큰을 보내 로그인 처리 요청
-        fetch('/google_login/callback', {  <!-- '/google_login/callback' 경로로 POST 요청 -->
+        fetch('/loginForm/callback', {  <!-- '/loginForm/callback' 경로로 POST 요청 -->
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

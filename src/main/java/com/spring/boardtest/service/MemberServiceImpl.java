@@ -21,7 +21,7 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public Member saveMember(MemberDTO memberDTO, HttpServletRequest request)  {
         //기존 회원
-        Member findMember = memberRepository.findByEmail(memberDTO.getEmail()).orElse(null);
+        Member findMember = memberRepository.findByEmail(memberDTO.getEmail());
 
         if (findMember != null) {
             //기존 회원 로그인

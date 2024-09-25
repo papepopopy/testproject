@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultrag.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/basic}"    >
+
+
+<!-- 현재 페이지에서만 사용하는 컨텐츠(내용) 정의 -->
+<div layout:fragment="content" class="p-4">
+    <h2>Login</h2>
+    <hr>
+    <div class="m-3 p-4">
+        <form action="/members/login" method="post" id="loginForm">
+            <div class="mb-3">
+                <label for="email" class="form-label">Email address</label>
+                <input type="text" class="form-control"
+                       name="email"
+                       id="email" placeholder="이메일을 입력">
+            </div>
+            <div class="mb-3 ">
+                <label for="password" class="col-sm-2 col-form-label">Password</label>
+                <input type="password" class="form-control"
+                       name="password"
+                       id="password" placeholder="비밀버호를 입력">
+                <div>
+                    <!-- 로그인 실패시 서버에 전송 에러 메시지 출력 -->
+                </div>
+            </div>
+
+
+            <div class="mb-3 ">
+                <input type="checkbox" class="form-checkbox"
+                       name="remember-me" id="auto"></input>
+                <label for="auto">Remember me</label>
+            </div>
+            <div class="mb-3 ">
+                <button type="submit" class="btn btn-primary ">Login</button>
+                <button type="button" class="btn btn-secondary"
+                        onclick="location.href='members/new'">회원가입</button>
+            </div>
+            <!--
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+            -->
+        </form>
+    </div>
+
+
+</div>
+
+<!-- 현재 페이지에서만 사용하는 css 정의 -->
+<style layout:fragment="mystyle" th:inline="css">
+    .fieldError{
+      color: red;
+      font-size: 0.8em;
+
+      padding: 0.2em;
+      padding-left: 1em;
+      padding-right: 1em;
+
+    }
+</style>
+<!-- Google 로그인 로드. 클라이언트 ID와 로그인 URI를 지정 -->
+<div id="g_id_onload"
+     data-client_id="96181768947-eckgakvudg11uqfh4c07khmpkpgiq4i1.apps.googleusercontent.com"
+     data-login_uri="http://localhost:5502/loginForm"> <!-- 로그인 성공 후 리디렉션될 URI -->
+data-auto_prompt="false"> <!-- 자동으로 로그인 팝업을 띄우지 않도록 설정 -->
+</div>
+
+<!-- Google 로그인 버튼 표시 -->
+<div class="g_id_signin"
+     data-type="standard"><!-- 버튼 유형: standard -->
+data-size="large" <!-- 버튼 크기: large -->
+data-theme="outline" <!-- 버튼 테마: 테두리 있는 모양 -->
+data-text="sign_in_with" <!-- 버튼 텍스트: "sign in with" -->
+data-shape="rectangular" <!-- 버튼 모양: 직사각형 -->
+data-logo_alignment="left"> <!-- Google 로고 정렬: 왼쪽 -->
+</div>
+
+<!-- 로그인 성공 시 Google이 응답하는 JWT 토큰 처리 함수 -->
+<script>
+    function handleCredentialResponse(response) {
+        const token = response.credential; // 구글로부터 받은 JWT 토큰
+        console.log("Encoded JWT ID token: " + token);
+
+        // 서버에 JWT 토큰을 보내 로그인 처리 요청
+        fetch('/loginForm/callback', {  <!-- '/loginForm/callback' 경로로 POST 요청 -->
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ token }) // JWT 토큰을 JSON으로 서버에 전송
+        })
+        .then(response => {
+            if (response.ok) {  <!-- 서버 응답이 성공적이면 -->
+                window.location.href = '/';  <!-- 메인 페이지로 리디렉션 -->
+            } else {  <!-- 실패하면 오류 메시지 표시 -->
+                alert('로그인 실패. 다시 시도해 주세요.');
+            }
+        })
+        .catch(error => {  <!-- 네트워크 오류 처리 -->
+            console.error('Error:', error);
+        });
+    }
+</script>
+
+<!-- 구글 API 클라이언트 스크립트 로드 -->
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+
+<!-- 현재 페이지에서만 사용하는 css 정의 -->
+<script layout:fragment="myscript" th:inline="javascript">
+
+</script>
+
+</html>

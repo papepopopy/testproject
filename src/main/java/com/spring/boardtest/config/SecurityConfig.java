@@ -17,11 +17,11 @@ public class SecurityConfig implements WebMvcConfigurer {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/css/**", "/js/**", "/google_login**", "/login/**",  "/oauth2/**").permitAll() // 리소스와 로그인 페이지 허용
+                        .requestMatchers("/", "/css/**", "/js/**", "/loginForm**", "/login/**",  "/oauth2/**").permitAll() // 리소스와 로그인 페이지 허용
                         .anyRequest().authenticated() // 그 외 모든 요청은 인증 필요
                 )
                 .oauth2Login(oauth -> oauth
-                        .loginPage("/google_login") // 로그인 페이지
+                        .loginPage("/loginForm") // 로그인 페이지
                         .defaultSuccessUrl("/profileForm", true) // 로그인 성공 시 리다이렉트할 URL
                         .failureUrl("/login?error=true") // 로그인 실패 시 리다이렉트할 URL
                 )
