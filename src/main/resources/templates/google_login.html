@@ -6,55 +6,53 @@
     <title>Google Login</title>
 </head>
 <body>
-    <div id="g_id_onload"
-         data-client_id="96181768947-eckgakvudg11uqfh4c07khmpkpgiq4i1.apps.googleusercontent.com"
-         data-login_uri="http://localhost:5502/google_login"
-         data-auto_prompt="false">
-    </div>
-    <div class="g_id_signin"
-         data-type="standard"
-         data-size="large"
-         data-theme="outline"
-         data-text="sign_in_with"
-         data-shape="rectangular"
-         data-logo_alignment="left">
-    </div>
-    <!--<script>
-        function handleCredentialResponse(response) {
-            console.log("Encoded JWT ID token: " + response.credential);
-            // 여기에서 JWT 토큰을 사용해 백엔드로 보내거나 클라이언트 측에서 사용
-        }
-    </script>-->
-    <script>
-        function handleCredentialResponse(response) {
-            const token = response.credential;
-            console.log("Encoded JWT ID token: " + token);
 
-            // 서버에 JWT 토큰을 전송하여 로그인 처리
-            fetch('/google_login/callback', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ token }) // JWT 토큰을 JSON 형태로 전송
-            })
-            .then(response => {
-                if (response.ok) {
-                    // 로그인 성공 후 메인 페이지로 리디렉션
-                    window.location.href = '/'; // 메인 페이지 URL
-                } else {
-                    // 로그인 실패 처리
-                    alert('로그인 실패. 다시 시도해 주세요.');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
-        }
-    </script>
+<!-- Google 로그인 로드. 클라이언트 ID와 로그인 URI를 지정 -->
+<div id="g_id_onload"
+     data-client_id="96181768947-eckgakvudg11uqfh4c07khmpkpgiq4i1.apps.googleusercontent.com"
+     data-login_uri="http://localhost:5502/google_login" <!-- 로그인 성공 후 리디렉션될 URI -->
+data-auto_prompt="false"> <!-- 자동으로 로그인 팝업을 띄우지 않도록 설정 -->
+</div>
 
-    <!--구글 api 사용을 위한 스크립트-->
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
+<!-- Google 로그인 버튼 표시 -->
+<div class="g_id_signin"
+     data-type="standard" <!-- 버튼 유형: standard -->
+data-size="large" <!-- 버튼 크기: large -->
+data-theme="outline" <!-- 버튼 테마: 테두리 있는 모양 -->
+data-text="sign_in_with" <!-- 버튼 텍스트: "sign in with" -->
+data-shape="rectangular" <!-- 버튼 모양: 직사각형 -->
+data-logo_alignment="left"> <!-- Google 로고 정렬: 왼쪽 -->
+</div>
+
+<!-- 로그인 성공 시 Google이 응답하는 JWT 토큰 처리 함수 -->
+<script>
+    function handleCredentialResponse(response) {
+        const token = response.credential; // 구글로부터 받은 JWT 토큰
+        console.log("Encoded JWT ID token: " + token);
+
+        // 서버에 JWT 토큰을 보내 로그인 처리 요청
+        fetch('/google_login/callback', {  <!-- '/google_login/callback' 경로로 POST 요청 -->
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ token }) // JWT 토큰을 JSON으로 서버에 전송
+        })
+        .then(response => {
+            if (response.ok) {  <!-- 서버 응답이 성공적이면 -->
+                window.location.href = '/';  <!-- 메인 페이지로 리디렉션 -->
+            } else {  <!-- 실패하면 오류 메시지 표시 -->
+                alert('로그인 실패. 다시 시도해 주세요.');
+            }
+        })
+        .catch(error => {  <!-- 네트워크 오류 처리 -->
+            console.error('Error:', error);
+        });
+    }
+</script>
+
+<!-- 구글 API 클라이언트 스크립트 로드 -->
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 
 </body>
 </html>
