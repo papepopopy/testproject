@@ -3,6 +3,7 @@ package com.spring.boardtest.service;
 import com.spring.boardtest.dto.MemberDTO;
 import com.spring.boardtest.entity.Member;
 import com.spring.boardtest.repository.MemberRepository;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -18,7 +19,7 @@ public class MemberServiceImpl implements MemberService {
     private final AuthenticationManager authenticationManager;
 
     @Override
-    public Member saveMember(MemberDTO memberDTO)  {
+    public Member saveMember(MemberDTO memberDTO, HttpServletRequest request)  {
         //기존 회원
         Member findMember = memberRepository.findByEmail(memberDTO.getEmail()).orElse(null);
 
@@ -32,7 +33,7 @@ public class MemberServiceImpl implements MemberService {
         Member newMember = new Member();
         newMember.setEmail(memberDTO.getEmail());
         newMember.setName(memberDTO.getName());
-        newMember.setPassword(null); // 비밀번호 필요 없음
+//        newMember.setPassword(null); // 비밀번호 필요 없음
 
         //새로운 사용자
         memberRepository.save(newMember);

@@ -29,7 +29,7 @@ public class Member {
 //    private String profileImageUrl;
 
 //    @Column(nullable = false) // 비밀번호는 필수
-    private String password;
+//    private String password;
 
     @ElementCollection(fetch = FetchType.EAGER) // 권한 컬렉션
     private Set<String> roles = new HashSet<>();

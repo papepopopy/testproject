@@ -10,6 +10,7 @@ import lombok.ToString;
 public class MemberDTO {
     private String email;
     private String name;
+    private String picture;
 //    private String profileImageUrl;
     private String password;
 }
