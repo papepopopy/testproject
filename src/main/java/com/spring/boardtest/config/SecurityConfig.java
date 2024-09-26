@@ -24,8 +24,9 @@ public class SecurityConfig implements WebMvcConfigurer {
                         .loginPage("/loginForm") // 로그인 페이지 지정
                         .defaultSuccessUrl("/profileForm", true) // 로그인 성공 시 프로필 페이지로 리다이렉트
                         .failureUrl("/login?error=true") // 로그인 실패 시 리다이렉트할 URL
-                        .userInfoEndpoint() // 사용자 정보를 가져오는 엔드포인트
-                        .userService(customOAuth2UserService()) // Custom OAuth2 사용자 서비스 사용
+                        .userInfoEndpoint(userInfo -> userInfo
+                            .userService(customOAuth2UserService()) // Custom OAuth2 사용자 서비스 사용
+                        ) // 사용자 정보를 가져오는 엔드포인트
                 )
                 .logout(logout -> logout
                         .logoutUrl("/logout") // 로그아웃 처리 경로

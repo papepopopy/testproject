@@ -45,7 +45,6 @@ dependencies {
 
 
 
-
 	// spring-boot-starter-validation: 서버 유효성 검사 라이브러리
 	implementation 'org.springframework.boot:spring-boot-starter-validation:3.3.2'
 	// modelmapper
@@ -68,10 +67,9 @@ dependencies {
 	
 	//SNS 로그인 모듈 추가
 	implementation 'org.springframework.boot:spring-boot-starter-security'
-	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
-
 	// https://mvnrepository.com/artifact/com.google.code.gson/gson
 	implementation 'com.google.code.gson:gson:2.11.0'
+	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
 
 	// spring-boot-devtools
 	//implementation 'org.springframework.boot:spring-boot-devtools:3.3.2'
@@ -86,12 +84,6 @@ dependencies {
 
 	//org.assertj/assertj-core
 	testImplementation 'org.assertj:assertj-core:3.26.3'
-
-
-
-
-
-
 
 	// 2. QueryDsl 관련 라이브러리
 	implementation "com.querydsl:querydsl-jpa:${queryDslVersion}:jakarta"
