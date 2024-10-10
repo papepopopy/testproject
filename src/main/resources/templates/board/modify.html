@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultrag.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/basic}"    >
+
+
+<!-- 현재 페이지에서만 사용하는 컨텐츠(내용) 정의 -->
+<div layout:fragment="content" class="p-4">
+
+  <div class="card">
+    <div class="card-header">
+      Board Modify
+    </div>
+
+    <div class="card-body m-4">
+      <form action="/board/modify"
+            th:action="@{/board/modify}" method="post" id="f1">
+        <!-- 1. 글 제목 -->
+        <div class="form-floating mb-3">
+
+          <input type="text" 	class="form-control"
+                 id="bno"
+                 name="bno"  th:value="${dto.bno}" readonly  >
+          <label for="title" >Bno</label>
+        </div>
+
+        <!-- 1. 글 제목 -->
+        <div class="form-floating mb-3">
+
+          <input type="text" 	class="form-control"
+                 id="title"
+                 name="title"   th:value="${dto.title}"
+                 placeholder="2자이상 100이내로 작성하세요">
+          <label for="title" >Title</label>
+        </div>
+
+        <!-- 2. 게시글 내용 -->
+        <div class="form-floating mb-3">
+          <!-- bootstrap에서 textarear rows 적용시 class가 "h-25"설정되어야 함. -->
+          <textarea class="form-control h-25"
+                    id="content"
+                    name="content"
+                    rows="10"
+          >[[${dto.content}]]</textarea>
+          <label for="content" >Comments</label>
+
+        </div>
+        <!-- 3. 게시글 작성자 -->
+        <div class="form-floating mb-3">
+          <input type="text" class="form-control"
+                 id="writer"
+                 name="writer" th:value="${dto.writer}" readonly
+                 placeholder="반드시 내용이 입력되어야 합니다." >
+          <label for="writer">Writer</label>
+        </div>
+
+        <!-- 4. 게시글 이미지 첨부파일 -->
+        <!--          <div class="form-floating mb-3">-->
+        <!--            <input type="text" class="form-control"-->
+        <!--                   id="writer"-->
+        <!--                   name="writer" th:value="${dto.writer}" readonly-->
+        <!--                   placeholder="반드시 내용이 입력되어야 합니다." >-->
+        <!--            <label for="writer">Writer</label>-->
+        <!--          </div>     -->
+
+        <!-- 5. 게시글 작성자 이메일
+         현재 로그인 사용자와 게시글 작성자가 동일한 판별하기위한 항목 -->
+        <div class="form-floating mb-3">
+          <!-- 로그인 상태일 경우만 #authentication객체변수 적용  -->
+          <input type="email" class="form-control"
+                 id="email"
+                 name="email"
+                 th:value="${dto.email}" readonly  />
+          <label for="writer">Email</label>
+        </div>
+
+        <!-- 6. 게시글 등록일, 수정일 -->
+        <div class="form-floating mb-3">
+          <input type="text" class="form-control"
+                 id="regDate"
+                 th:value="${#temporals.format(dto.regDate, 'yyyy-MM-dd HH:mm:ss')}" readonly
+          >
+          <label for="regDate">RegDate</label>
+        </div>
+        <div class="form-floating mb-3">
+          <input type="text" class="form-control"
+                 id="modDate"
+                 th:value="${#temporals.format(dto.modDate, 'yyyy-MM-dd HH:mm:ss')}" readonly
+          >
+          <label for="modDate">ModDate</label>
+        </div>
+
+        <div class="d-flex justify-content-between">
+          <!-- 4. List, Modify 버튼-->
+          <div class="my-4">
+            <button type="button" class="btn btn-primary   listBtn">List</button>
+            <button type="button" class="btn btn-secondary modBtn" >Modify default</button>
+            <!--<button type="button" class="btn btn-danger removeBtn">Remove</button>-->
+            <button type="button" class="btn btn-danger removeBtn"
+                    th:onclick="removeFile('[[${uuid}]]', '[[${fileName}]]', this)">Remove</button>
+          </div>
+          <!--이미지 첨부파일 버튼-->
+          <div class="d-flex my-4">
+            <label class="input-group-text">Images</label>
+            <div class="form-floating uploadHidden">
+              <button type="button" class="btn btn-primary px-3 uploadFileBtn">Add Files</button>
+            </div>
+          </div>
+        </div>
+
+      </form>
+    </div>
+
+  </div>
+
+
+  <!-- 첨부파일 관련 UI -->
+  <!-- 1. 첨부파일 섬네일 view -->
+  <div class="row mt-3">
+    <div class="col">
+
+      <div class="container-fluid d-flex uploadResult"
+           style="flex-wrap: wrap">
+        <!-- [[${dto.fileNames}]] -->
+
+        <!-- 기존에 이미지 첨부파일 View: fileName문자열구성 => uuid+"_"+파일이름.확장자   -->
+        <th:block th:each="fileName:${dto.fileNames}">
+          <div th:with="arr=${fileName.split('_')}"
+               class="card" style="width: 18rem;">
+
+            <div class="card-header d-flex justify-content-between">
+              <div>[[${arr[1]}]]</div>
+              <div>
+                <button class="btn-sm btn-danger  px-2"
+                        th:onClick="removeFile([[${arr[0]}]], [[${arr[1]}]], this)">X</button>
+                <div class="delImageFileNames" th:data-src="${arr[0]}" th:data-fileName="${arr[1]}"></div>
+              </div>
+            </div>
+            <div class="card-body">
+              <!-- 섬네일 이미지 파일 view -->
+              <img th:src="|/view/s_${fileName}|" th:data-src="${fileName}" />
+              <!-- 원본 이미지 view
+              <img th:src="|/view/${fileName}|" th:data-src="${fileName}" />
+              -->
+            </div>
+
+          </div>
+        </th:block>
+        <!-- ------------------------------------------ -->
+
+      </div>
+    </div>
+  </div>
+
+  <!--20240822-->
+  <!-- 2. 첨부파일 추가를 위한 모달창 -->
+  <div>
+    <div class="modal uploadModal" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Upload File</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="input-group mb-3">
+              <input type="file" name="files" id="files" class="form-control"  multiple />
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn  btn-secondary uploadBtn">Upload</button>
+            <button type="button" class="btn btn-outline-dark closeUploadBtn">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- axios라이브러리 연결 -->
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <!-- file upload 처리하는 javascript 연결 -->
+  <script src="/js/upload.js"></script>
+</div>
+
+<!-- 현재 페이지에서만 사용하는 css 정의 -->
+<style layout:fragment="mystyle" th:inline="css">
+  .uploadResult > .card {
+    margin-right: 0.3em;
+    margin-bottom: 0.3em;
+  }
+ .uploadResult > .card:last-child {
+    margin-right: 0;
+  }
+
+</style>
+
+<!-- 현재 페이지에서만 사용하는 css 정의 -->
+<script layout:fragment="myscript" th:inline="javascript">
+
+  // 서버로 부터 응답받은 메시지: db처리한 후 결과 값 전송한 객체
+  const errors = [[${errors}]]
+  console.log('errors',errors);
+
+  let errMessage = "";
+  if (errors) {// 서버로 부터 응답 에러 메시지 처리
+    console.log("서버로 부터 응답받은 에러 메시지")
+    for (let i=0; i<errors.length; i++){
+      errMessage += `${errors[i].field}은 ${errors[i].code}\n`;
+    }
+
+    // 웹브라우저의 세션 기록을 관리하는 JavaScript의 History API메서드
+    // 브라우저의 세션 기록을 수정하거 대체하는 역할
+    //history.replaceState({},null, null);
+
+    alert(errMessage)
+  }
+
+///////////////////////////////////////////////////////////////////
+
+  // 현재 글번호 게시글 페이징 정보
+  const link = [[${pageRequestDTO.getLink()}]]
+  const formObj = document.querySelector("#f1")
+
+  // 1. Modify 버튼 기능 처리
+  document.querySelector('.modBtn').addEventListener('click', function(e){
+    e.stopPropagation();// 현재 요소의 이벤트발생을 상위요소에서 이벤트 감지 하지 않게 기능
+    e.preventDefault(); // 기본 기능 제거
+    console.log("modify")
+
+    // javascript에서 action, method 속성 변경: 페이징 정보 추가
+    formObj.action = `/board/modify?${link}`
+
+    //첨부파일(추가)
+    appendFileData()
+
+    //첨부파일(삭제)
+    callRemoveFiles()
+
+
+    formObj.method = 'post';
+    formObj.submit();     // POST방식
+
+    // Get 방식(수정페이지요청)
+    //self.location=`/board/list?${link}`
+  });
+  function appendFileData() { //이미지 첨부파일 처리
+    const target = document.querySelector('.uploadHidden') //버튼
+    const uploadFiles = uploadResult.querySelectorAll('img') //이미지
+    console.log("uploadHidden", target)
+    console.log("upload img", uploadFiles)
+
+    let str = ``
+    for (let i=0; i< uploadFiles.length; i++) {
+      const uploadFile = uploadFiles[i]
+      const imgLink = uploadFile.getAttribute("data-src")
+
+      //수정된 이미지를 폼태그에 추가함
+      str += `<input type="hidden", name="fileNames" value="${imgLink}">`
+    }
+
+    target.innerHTML = str;
+  }
+
+  //파일 삭제
+  function callRemoveFiles() {
+    removeFileList.forEach(({uuid, fileName}) => {
+      removeFileToServer(uuid, fileName).then(response => {
+        console.log(response)
+      })
+    })
+  }
+
+  //업로드 파일 삭제
+  function delImageFileNames() {
+
+  }
+
+
+///////////////////////////////////////////////////////////////////
+
+function appendNotShowData(){
+  if(removeFileList.length == 0) return
+
+  const target = document.querySelector('.uploadHidden')
+  let str = ''
+  for (let i=0; i<removeFileList.length; i++) {
+    const {uuid, fileName} = removeFileList[i]
+    str += `<input type='hidden' name='fileNames' value='${uuid}_${fileName}'>`
+  }
+  target.innerHTML += str;
+}
+
+
+///////////////////////////////////////////////////////////////////
+// 2. List 버튼 기능 처리
+document.querySelector('.listBtn').addEventListener('click', function(e){
+  e.stopPropagation();
+  e.preventDefault(); // 기본 기능 제거
+  console.log("list")
+
+  // 전송 기능
+  //formObj.submit();
+
+  // 리셋 기능(폼값 초기화)
+  //formObj.reset();
+
+  self.location=`/board/list?${link}`
+});
+
+///////////////////////////////////////////////////////////////////
+
+// 3. Remove 버튼 기능 처리
+document.querySelector('.removeBtn').addEventListener('click', function(e){
+  e.stopPropagation();
+  e.preventDefault(); // 기본 기능 제거
+  console.log("Remove 버튼 기능")
+
+  //업로드 된 파일 삭제
+  callRemoveFiles();
+
+  if(!confirm("게시물을 삭제하시겠습니까?")){
+      return
+  }
+
+
+
+  //업로드 파일 추가
+  appendFileData();
+
+  //데이터 삭제
+  appendNotShowData();
+  //delImageFileNames();
+
+  // javascript 에서 action, method 속성 변경
+  formObj.action = `/board/remove`
+  formObj.method = 'post';
+  formObj.submit();
+
+});
+
+///////////////////////////////////////////////////////////////////
+//파일 삭제 관리
+// ------------------------------------------------  //
+//  게시글 삭제작업에서 첨부파일 [X]버튼으로 삭제시:
+//  이미지를 화면에 보지않도록 제거 , 업로된 파일 삭제하지 않음
+// -----------------------------------------------  //
+// 실제 수정작업 진행시 삭제될 파일 목록 저장
+const removeFileList = [] // 배열객체 선언
+
+function removeFile(uuid,fileName, obj){
+    console.log("파일 삭제 관리")
+
+    // 삭제할 파일목록 저장
+    if(!confirm("파일을 삭제하시겠습니까?")){
+        return
+    }
+
+    console.log(uuid)
+    console.log(fileName)
+    console.log(obj)
+
+    // 삭제할 파일목록 저장
+    removeFileList.push({uuid,fileName})
+    console.log('화면에서만 삭제한 이미지파일:', removeFileList)
+
+    // 요소.closest('선택요소') : 요소기준으로 상위요소중 가장가까운 요소 선택
+    // 현재요소에서 상위(부모)요소 찾을 경우 적용
+
+    // 자바스크립트 요소제거 : remove() removeChild()
+    // '.card' 요소제거: 썸네일 이미지 화면에서 삭제
+    const targetDiv = obj.closest(".card")
+    targetDiv.remove()
+
+}
+
+///////////////////////////////////////////////////////////////////
+
+// --------------------------------------------------------------------------------//
+// 업로드 모달
+// --------------------------------------------------------------------------------//
+const uploadModal = new bootstrap.Modal(document.querySelector('.uploadModal'))
+
+// 1. [Add Files]버튼 클릭하면 모달창 띄우기
+document.querySelector(".uploadFileBtn").addEventListener('click',function(e){
+  e.stopPropagation()
+  e.preventDefault()
+
+  console.log("업로드 모달")
+
+  uploadModal.show();// 모달창 표시
+
+})
+
+// 2. 업로드 모달에서 Close버튼 클릭
+document.querySelector(".closeUploadBtn").addEventListener('click',function(e){
+  e.stopPropagation()
+  e.preventDefault()
+
+   uploadModal.hide();// 모달창 숨기기
+
+})
+
+// 3.  업로드 모달에서 uploadBtn 버튼 클릭: 선택한 파일을 서버에 업로드처리
+document.querySelector(".uploadBtn").addEventListener('click',function(e){
+  e.stopPropagation()
+  e.preventDefault()
+
+  // 자바스크립트 FormData객체를 이용하여 전송할 파일을 저장(보관)
+  const formObj = new FormData()
+  const fileInput = document.querySelector("input[name='files']")
+  // 또는 const fileInput = document.querySelector("#files")
+  //console.log(fileInput.files)// 선택된 파일이름이 <input type="file" name="files" />요소에 배열구조로 저장
+
+  const files = fileInput.files
+  for (let i=0; i<files.length; i++){
+    // "files"키이름은 서버에 받을 UploadFileDTO객체속성중에서 files과 동일한 속성명이면 1:1자동 맵핑
+    formObj.append("files", files[i])   // javascript FormData객체를 이용해서 정보를 추가
+  }
+
+  // 업로드 처리하는 함수 호출: axios 요청
+  uploadToServer(formObj).then( result => {
+    console.log("업로드 정상처리 응답결과:"+result.data)
+
+    // 업로드된 결과를 JSON파일로 view 함수 호출
+    for (const uploadResult of result){
+      showUploadFile(uploadResult)
+    }
+
+    uploadModal.hide() // 모달창 숨기기
+  }).catch( e => {
+    console.log('업로드 실패=>', e)
+    uploadModal.hide()
+  })
+})
+
+///////////////////////////////////////////////////////////////////
+
+//  업로드된 결과값을 view해서 보여줄  태그 요소 추출
+const uploadResult = document.querySelector('.uploadResult');
+
+function showUploadFile({uuid, fileName, img, link}){
+
+  console.log("로드된 파일 표시")
+
+  console.log("file name:",fileName)
+  console.log("uuid:",uuid)
+  console.log("link:",link) // link는 Link()을 실행하여 결과값을 출력
+  console.log("img:",img)
+
+  const str =
+  `
+  <div class="card" style="width: 18rem;">
+  <div class="card-header d-flex justify-content-between">
+    <div>${fileName}</div>
+    <div>
+      <button class="btn-sm btn-danger  px-2"
+              onClick="javascript:removeFile('${uuid}', '${fileName}', this)">X</button>
+    </div>
+  </div>
+  <div class="card-body">
+      <img src="/view/${link}" data-src="${uuid+"_"+fileName}" />
+  </div>
+  </div>
+  `
+   uploadResult.innerHTML += str
+   //console.log(str)
+}
+
+///////////////////////////////////////////////////////////////////
+
+
+</script>
+
+</html>
+
+<!--
+  사용목적 요약
+
+- 현재 페이지의 URL을 새로운 URL로 변경
+- 이에 따라 페이지의 상태 정보도 업데이트
+- 실제로 페이지의 리로드나 네트워크 요청은 발생하지 않음
+- 사용자 경험을 개선하면서도 페이지 간 전환이나 상태 관리를 자유롭게 제어
+
+ex(
+// 현재 URL: http://example.com/page1
+const newState = { data: 'some data' };
+// 현재 URL과 상태를 새로운 URL과 상태로 변경
+history.replaceState(newState, '', 'http://example.com/page2');
+
+-->

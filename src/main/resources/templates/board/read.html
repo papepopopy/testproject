@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      xmlns:layout="http://www.ultrag.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/basic}"    >
+
+
+<!-- 현재 페이지에서만 사용하는 컨텐츠(내용) 정의 -->
+<div layout:fragment="content" class="p-4">
+
+  <div class="card">
+    <div class="card-header">
+      Board Read
+    </div>
+
+    <div class="card-body m-4">
+      <form action="/board/register" method="post" >
+        <!-- 1. 글 제목 -->
+        <div class="form-floating mb-3">
+
+          <input type="text" 	class="form-control"
+                 id="bno"
+                 name="bno"  th:value="${dto.bno}" readonly  >
+          <label for="title" >Bno</label>
+        </div>
+
+        <!-- 1. 글 제목 -->
+        <div class="form-floating mb-3">
+
+          <input type="text" 	class="form-control"
+                 id="title"
+                 name="title"   th:value="${dto.title}" readonly
+                 placeholder="2자이상 100이내로 작성하세요">
+          <label for="title" >Title</label>
+        </div>
+
+        <!-- 2. 게시글 내용 -->
+        <div class="form-floating mb-3">
+          <!-- bootstrap에서 textarear rows 적용시 class가 "h-25"설정되어야 함. -->
+          <textarea class="form-control h-25"
+                    id="content"
+                    name="content"
+                    rows="10"
+                    readonly
+          >[[${dto.content}]]</textarea>
+          <label for="content" >Comments</label>
+
+        </div>
+        <!-- 3. 게시글 작성자 -->
+        <div class="form-floating mb-3">
+          <input type="text" class="form-control"
+                 id="writer"
+                 name="writer" th:value="${dto.writer}" readonly
+                 placeholder="반드시 내용이 입력되어야 합니다." >
+          <label for="writer">Writer</label>
+        </div>
+        <!-- 3-1. 게시글 작성자 이메일 -->
+        <div class="form-floating mb-3">
+          <input type="email" class="form-control"
+                 id="email"
+                 name="email" th:value="${dto.email}" readonly
+                 placeholder="반드시 내용이 입력되어야 합니다." >
+          <label for="email">Email</label>
+        </div>
+        <!-- 4. 게시글 등록일, 수정일 -->
+        <div class="form-floating mb-3">
+          <input type="text" class="form-control"
+                 id="regDate"
+                 th:value="${#temporals.format(dto.regDate, 'yyyy-MM-dd HH:mm:ss')}" readonly
+          >
+          <label for="regDate">RegDate</label>
+        </div>
+        <div class="form-floating mb-3">
+          <input type="text" class="form-control"
+                 id="modDate"
+                 th:value="${#temporals.format(dto.modDate, 'yyyy-MM-dd HH:mm:ss')}" readonly
+          >
+          <label for="modDate">ModDate</label>
+        </div>
+
+
+        <!-- 4. List, Modify 버튼 -->
+        <!-- 로그인 상태 정보 객체(#authentication.principal:로그인 했을 경우에만 생성되는 객체변수) -->
+        <div class="my-4"
+             sec:authorize="isAuthenticated()"
+             th:with="user=${#authentication.principal}">
+
+          <!-- 로그인 미적용
+          <div class="my-4">   -->
+
+          <!-- 현 글번호에 대한 페이징 정보를 넘겨받아서 list요청시 페이징 정보와 같이 요청하면 현재 글번호가 해당되는 list페이지 추출됨 -->
+          <div class="float-end" th:with="link=${pageRequestDTO.getLink()}">
+
+            <a th:href="|@{/board/list}?${link}|">
+              <button type="button" class="btn btn-primary ">List</button></a>
+
+            <!-- 로그인 미적용
+            <a th:href="|@{/board/modify(bno=${dto.bno})}&${link}|">
+              <button type="button" class="btn btn-secondary" >Modify</button>
+            </a>  -->
+
+            <!-- 게시글 작성자(dto.writer)와 로그인 인증자와 동일하면  -->
+            <a  th:if="${user != null && user.username == dto.email}"
+                th:href="|@{/board/modify(bno=${dto.bno})}&${link}|">
+              <button type="button" class="btn btn-secondary" >Modify</button>
+            </a>
+          </div>
+        </div>
+
+      </form>
+    </div>
+
+
+    <!-- 첨부된 이미지 view -->
+    <div class="col">
+      <!-- 3. 게시글에 대한 이미지 첨부파일 -->
+      <div class="py-2 thumbnail " th:if="${dto.fileNames != null && dto.fileNames.size() > 0}" >
+        <img class="img-thumbnail"
+             th:each="fileName: ${dto.fileNames}"
+             th:src="|/view/${fileName}|" />
+      </div>
+    </div>
+
+  </div>
+  <!-- --------------------------------------------------------------------  -->
+
+  <!-- 댓글 list view -->
+  <div class="row mt-3">
+    <div class="col-md-12">
+      <div class="my-4">
+        <button class="btn btn-info addReplyBtn">ADD REPLY</button>
+      </div>
+      <div class="">
+        <ul class="list-group replyList"> <!--  댓글리스트 -->
+          <li class="list-group-item ">
+            댓글이 없습니다.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- 댓글 페이징 -->
+  <div class="row mt-3">
+    <div class="col">
+      <ul class="pagination replyPaging"> <!--  댓글 페이징 번호 -->
+
+      </ul>
+    </div>
+  </div>
+
+
+
+
+  <!-- --------------------------------------------------------------------  -->
+  <!-- Modal UI start-->
+
+  <!-- reply register modal -->
+  <div class="modal registerModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Regisger Reply</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <!-- 댓글 추가시 현재 로그인한 사용자가 되도록 하기위한 설정 -->
+          <div sec:authorize="isAuthenticated()"
+               th:with="user=${#authentication.principal}">
+
+            <div class="input-group mb-3">
+              <span class="input-group-text">Reply Text</span>
+              <input type="text" class="form-control replyText"/>
+            </div>
+            <div class="input-group mb-3">
+              <span class="input-group-text">Replyer</span>
+              <!-- 로그인 미적용시
+              <input type="text" class="form-control replyer" />
+               -->
+              <input type="text" class="form-control replyer"
+                     th:value="${user.username}" readonly  />
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary registerBtn">Register</button>
+          <button type="button" class="btn btn-secondary closeRegisterBtn">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--  end reply register modal-->
+
+  <!-- reply read and modify modal -->
+  <div class="modal modifyModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title replyHeader"></h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="input-group mb-3">
+            <span class="input-group-text">Reply Text</span>
+            <input type="text" class="form-control modifyText"/>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-info modifyBtn">Modify</button>
+          <button type="button" class="btn btn-primary removeBtn">Remove</button>
+          <button type="button" class="btn btn-secondary closeModifyBtn">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--  end reply register modal-->
+
+
+  <!-- message modal -->
+  <div class="modal  messageModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Message</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <!-- 메시지 전달 하는 부분 -->
+          <p id="modal_message"></p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <!--          <button type="button" class="btn btn-primary">Save changes</button>-->
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- end message modal -->
+
+  <!-- --------------------------------------------------------------------  -->
+
+
+  <!-- Axios 라이브러리 연결 -->
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="/js/reply.js"></script>
+</div>
+
+
+
+<!-- 현재 페이지에서만 사용하는 css 정의 -->
+<style layout:fragment="mystyle" th:inline="css">
+  .mylink {
+    cursor: pointer;
+  }
+  .thumbnail > img {
+    margin-right: 0.2em;
+    margin-bottom: 0.2em;
+  }
+  .thumbnail > img:last-child {
+    margin-right: 0; margin-bottom: 0;
+  }
+
+</style>
+
+
+
+<!-- 현재 페이지에서만 사용하는 css 정의 -->
+<script layout:fragment="myscript" th:inline="javascript">
+
+  //서버로 부터 응답받은 메시지: db처리한 후 결과 값 전송한 객체
+  const result = [[${result}]]
+  const bno = [[${dto.bno}]]  // 전역 변수: 댓글에 대한 게시글 번호
+
+  /*
+  //const reply_bno = document.querySelector('#bno').value;
+  //console.log("reply_bno:", reply_bno);
+  console.log("dto_bno:", bno);
+
+  // ------------------------------------------------------ //
+  // 특정 게시글에 대한 댓글 조회 : axios(비동기) 요청 테스트
+  // ------------------------------------------------------ //
+  // 비동기 처리방식
+  /*
+  getReply(bno)
+        .then( data => {
+                console.log(data);
+                console.log(data.list);
+         })
+        .catch( e => {console.log(e)});
+  */
+  // ------------------------------------------------------ //
+
+
+  //------------------------------------------------------------------------ //
+  const replyBnoList = document.querySelector('.replyList'); // 댓글 목록 DOM
+  const replyPaging = document.querySelector('.replyPaging');// 페이지 목록 DOM
+  //------------------------------------------------------------------------ //
+  // 4. 페이징 처리
+  //------------------------------------------------------------------------ //
+  function printPages(data){
+    console.log("paging:", data);
+
+
+    // pagination
+    let pageStr = ''
+
+   if (data && data.dtoList.length > 0 ){  // 댓글이 있을 경우만  페이징 처리
+
+      // 이전 버튼
+      if (data.prev) {
+        pageStr += `<li class="page-item"><a class="page-link" data-page="${data.start-1}">이전</a></li>`
+      }
+
+      // 페이지번호 버튼
+      for (let i=data.start; i<=data.end; i++){
+        pageStr += `<li class="page-item ${i==data.page?"active":""}"><a class="page-link" data-page="${i}">${i}</a></li>`
+      }
+      // 다음 버튼
+      if (data.next) {
+      pageStr += `<li class="page-item"><a class="page-link" data-page="${data.end+1}">다음</a></li>`
+      }
+
+    } // end if
+
+    replyPaging.innerHTML = pageStr;
+
+  }
+  //----------------------------------------------------------------- //
+  // 3. 서버로 부터 받아온 댓글을 DOM을 구성할 수 있는 문자열 생성 및 DOM생성
+  //----------------------------------------------------------------- //
+  function printList(replyList){
+    let str ='';
+
+    // 댓글이 1개 이상이면 처리 댓글 목록 가져와서 View처리
+    if (replyList && replyList.length > 0 ){
+
+      for (const dto of replyList){
+        str +=
+        `
+          <li class="list-group-item d-flex replyItem">
+            <span class="col-2">${dto.rno}</span>
+            <span class="col-6 mylink"
+                  data-rno="${dto.rno}">
+                  ${dto.replyText}
+            </span>
+            <span class="col-2">${dto.replyer}</span>
+            <span class="col-2">${dto.regDate}</span>
+          </li>
+        `
+      }// end for
+    }// end for
+    //console.log("list:", str);
+    replyBnoList.innerHTML = str;
+  }
+
+  // 2. 게시글에 대한 댓글 서버에 요청해서 data 받아오기
+  function printReplies(page, size, goLast){
+
+    // 비동기 처리함수 호출
+    getList({bno, page, size, goLast})
+          .then( data => {
+
+            console.log("printReplies() data.dtoList:",data.dtoList);
+
+            // 댓글에 대한 View처리
+            printList(data.dtoList);          // 댓글 목록 처리하는 함수 호출
+            printPages(data);                 // 페이징 처리할 함수 호출
+          })
+          .catch(e => {console.log(e)})
+  }
+
+
+  // ------------------------------------------------------------------------ //
+  // 1.  게시글에 대한 댓글 요청하는 함수 실행(호출):
+  //     - 댓글이 있을 경우만 조회및 페이징 처리
+  // ------------------------------------------------------------------------ //
+
+  let page = 1; // 현재 페이지 번호
+  let size = 5; // 페이지해당 되는 레코드(행)의 개수
+  printReplies(page,size,true);// 현재 페이지번호, 페이지 사이즈, 마지막 페이지 사용여부
+
+  // ------------------------------------------------------------------------ //
+
+
+
+  // 5. 이벤트 처리
+
+  //--------------------------------------------- //
+  // 5-1. 페이지 번호 클릭
+  //--------------------------------------------- //
+  replyPaging.addEventListener('click', function(e){
+    e.preventDefault();
+    e.stopPropagation();
+
+    const target = e.target;
+    if (!target || target.tagName != 'A'){
+      return;
+    }
+
+    // <a>태그일 경우만 처리
+    // 현재 클릭한 태그 요소의 페이지 번호 추출0
+    const pageNum = target.getAttribute("data-page");
+    page = pageNum;
+    console.log("page number:",page)
+    printReplies(page, size)
+
+  });
+
+  //--------------------------------------------- //
+  // 5-2 댓글 등록 모달창
+  //--------------------------------------------- //
+  const registerModal = new bootstrap.Modal(document.querySelector('.registerModal'));
+
+  const registerBtn =  document.querySelector('.registerBtn');
+  const closeRegisterBtn = document.querySelector('.closeRegisterBtn');
+
+  const replyText = document.querySelector(".replyText");
+  const replyer = document.querySelector(".replyer");
+
+  document.querySelector('.addReplyBtn')
+          .addEventListener('click', function(e){  // addReply 버튼 클릭을 처리하는 이벤트 핸들러
+    registerModal.show()
+  });
+
+  registerBtn.addEventListener('click', function(e){      // 댓글 모달 창에 있는  register 버튼
+      console.log('register click')
+
+      // 전송할 data를 JSON객체로 선언
+      const replyObj = {
+        bno: bno,                       // 댓글에 대한 게시글 번호
+        replyText: replyText.value,     // 댓글 내용
+        replyer: replyer.value          // 댓글 작성자
+      }
+      console.log("전송할 JSON:", replyObj);
+
+      // 비동기 처리방식으로 data 서버에 보내기
+      addReply(replyObj)
+            .then( result => {
+              console.log("response data:",result)
+              console.log("rno:",result.rno)
+
+              alert(result.rno)
+
+              registerModal.hide(); // 모달 창 닫기
+              replyText.value='';   // 댓글 내용 clear
+              //replyer.value='';     // 댓글 작성자 clear: 현재 로그인 상태인 경우는 생략
+
+              // 댓글 등록한 후 댓글 List호출
+              printReplies(1,10, true)// true설정하면 마지막 페이지 호출
+
+            })
+            .catch(e => alert(e))
+
+
+  });
+  closeRegisterBtn.addEventListener('click', function(e){ // 댓글 모달 창에 있는  clsoe 버튼
+    registerModal.hide()
+  });
+
+  //--------------------------------------------- //
+  // 5-3. 댓글 조회 및 수정
+  //--------------------------------------------- //
+  const modifyModal = new bootstrap.Modal(document.querySelector('.modifyModal'));
+  const replyList = document.querySelector('.replyList');
+
+  const replyHeader = document.querySelector('.replyHeader'); // 모달창의 제목
+  const modifyText = document.querySelector('.modifyText');   // 댓글 내용
+
+  const modifyBtn = document.querySelector('.modifyBtn');
+  const removeBtn = document.querySelector('.removeBtn');
+  const closeModifyBtn = document.querySelector('.closeModifyBtn');
+
+  //-------------------------------------------------------------- //
+  // 현재 로그인 사용자와 댓글 작성자가 동일인 경우 수정 작업처리
+    const currentUser = [[${#authentication.principal.username}]]
+    let hasAuth = false     // 댓글의 작성자와 currentUser의 일치 여부
+  //-------------------------------------------------------------- //
+
+  // 댓글 목록에서 특정 댓글 항목을 선택할 경우 처리하는 리스터
+  replyList.addEventListener('click', function(e){
+    e.stopPropagation();
+    // console.log(e)
+
+    const target = e.target;
+    if (!target || target.tagName != 'SPAN'){
+      return;
+    }
+
+    // <SPAN>태그일 경우만 처리
+    // 현재 클릭한 태그 요소의 댓글 번호 (rno)값 추출
+    const rno = target.getAttribute("data-rno");
+    if (!rno){// 값이 없으면, 비어 있으면
+      return
+    }
+
+    console.log('span click: rno =>', rno);
+
+    // 댓글 번호가 있으면 처리
+    getReply(rno)
+        .then(reply => {
+          console.log("클릭한 댓글내용 :",reply);
+
+          replyHeader.innerHTML = reply.rno;
+          modifyText.value = reply.replyText;
+          modifyModal.show();  // modify 모달창 표시
+
+          // 댓글 작성자와 현재로그인 동일 여부 판단
+          hasAuth = (currentUser === reply.replyer)
+        })
+        .catch(e => alert('error'));
+
+
+  });
+
+  // 댓글 수정
+  modifyBtn.addEventListener('click', function(e){
+    console.log('modify')
+
+    if (!hasAuth) {               // 댓글 작성자와 현재로그인 동일하지 않으면 처리
+      alert("댓글 작성자만 수정이 가능합니다.");
+      modifyModal.hide()
+      return                      // 함수 종료
+    }
+
+    const replyObj = {
+      bno: bno,                       // 댓글에 대한 게시글번호
+      rno: replyHeader.innerHTML,     // 댓글 번호
+      replyText: modifyText.value     // 댓글 내용
+    }
+
+    // 비동기 처리 요청
+    modifyReply(replyObj)
+            .then(result => {
+              alert(result.rno+' 댓글이 수정되었습니다.');
+
+              replyText.value = ''
+              modifyModal.hide()
+
+              //첫 페이지부터 댓글 List 조회
+              //page = 1;
+              //printReplies(page, size)
+              printReplies(page, size, true) // 댓글 List조회 마지막 페이지 설정 여부(true)
+            })
+            .catch(e =>  console.log(e));
+
+  });
+
+  // 댓글 삭제
+  removeBtn.addEventListener('click', function(e){
+    console.log('remove')
+
+
+    if (!hasAuth) {               // 댓글 작성자와 현재로그인 동일하지 않으면 처리
+      alert("댓글 작성자만 삭제 가능합니다.");
+      modifyModal.hide()
+      return                      // 함수 종료
+    }
+
+    let isOK = confirm('삭제 하시겠습니까?')
+    console.log('remove isOK:', isOK);
+
+     if (!isOK) return;
+
+     // 삭제여부 버튼 true(확인)이면 처리
+     let rno = replyHeader.innerHTML;
+     removeReply(rno)
+            .then(result => {
+              alert(result.rno+' 댓글이 삭제되었습니다.');
+
+              replyText.value = ''
+              modifyModal.hide()
+
+              //첫 페이지부터 댓글 List 조회
+              //page = 1;
+              //printReplies(page, size)
+
+              printReplies(page, size, true) // 댓글 List조회 마지막 페이지 설정 여부(true)
+            })
+            .catch(e =>  console.log(e));
+
+  });
+  closeModifyBtn.addEventListener('click', function(e){
+    modifyModal.hide();
+  });
+
+
+  //--------------------------------------------- //
+  // response message show modal창에 메시지 출력하기
+  //-------------------------------------------- //
+  const message_show = new bootstrap.Modal(document.querySelector('.messageModal'));
+
+  let message = "";
+  if (result) { // 응답이 있을 경우만 처리
+    if (result=="modified"){// 응답 객체 내용이 "modified"이면 처리
+        message = bno+"번 글번호 게시글이 수정 되었습니다.";
+
+        // 모달 창에 전달할 메시지 태그 요소 추출
+        const modal_message = document.querySelector('#modal_message');
+        // 메시지 문자열를 태그요소에 넣기
+        modal_message.innerHTML = message;
+
+        // 모달 창 표시
+        message_show.show();
+    }
+  }
+
+
+
+
+</script>
+
+
+</html>
